@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoteNest - Leaderboards</title>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- CSS -->
+  <link rel="stylesheet" href="Frontend/src/assets/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header"> <!-- Changed from app-header to match CSS -->
+      <div class="container">
+        <div class="header-container"> <!-- Changed from header-content to match CSS -->
+          <!-- Logo -->
+          <div class="logo" onclick="navigateToHome()">
+            <h1>VoteNest</h1>
+          </div>
+
+          <!-- Navigation Menu -->
+          <nav class="nav"> <!-- Changed from desktop-nav to match CSS -->
+            <ul class="nav-menu"> <!-- Added nav-menu class -->
+              <li class="nav-item"><a href="/" class="nav-link">Home</a></li> <!-- Added nav classes -->
+              <li class="nav-item"><a href="/competitions.html" class="nav-link">Competitions</a></li>
+              <li class="nav-item"><a href="/leaderboard.html" class="nav-link active">Leaderboards</a></li>
+            </ul>
+          </nav>
+
+          <!-- Header Actions -->
+          <div class="header-actions">
+            <button id="login-btn" class="login-btn">Login / Sign Up</button> <!-- Changed class -->
+            <button id="menu-toggle" class="hamburger"> <!-- Changed class -->
+              <span class="hamburger-line"></span> <!-- Changed structure -->
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div id="drawer" class="nav-menu mobile-only"> <!-- Added mobile class -->
+      <div class="drawer-header">
+        <div class="logo">
+          <h2>VoteNest</h2>
+        </div>
+        <button id="drawer-close" class="drawer-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <ul id="nav-list" class="nav-list"></ul>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="container"> <!-- Added container class -->
+      <!-- Leaderboard content will load here -->
+      <section class="leaderboard-container">
+        <div class="leaderboard-header">
+          <h2 class="section-title">Leaderboard</h2> <!-- Added class -->
+        </div>
+        <!-- Content will be dynamically inserted -->
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="copyright">
+            &copy; 2025 VoteNest. All rights reserved.
+          </div>
+          <div class="footer-links">
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/assets/js/api-client.js"></script>
+  <script src="/assets/js/category-images.js"></script>
+  <script>
+    // Mobile menu toggle functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const hamburger = document.querySelector('.hamburger');
+      const navMenu = document.querySelector('.nav-menu.mobile-only');
+      
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+      });
+
+      // Rest of your existing JS...
+    });
+  </script>
+</body>
+</html>
