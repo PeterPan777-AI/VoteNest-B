@@ -1,0 +1,7 @@
+# backend/.gitignore
+
+# Ignore Node.js dependency folder
+node_modules
+
+# Ignore environment files (often contain secrets)
+.env

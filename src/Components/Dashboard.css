@@ -1,0 +1,162 @@
+/* src/Dashboard.css */
+/* --- Full Replacement Code (CSS ONLY) --- */
+
+.dashboard-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 20px auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-container h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Style for error messages specifically in the dashboard */
+.dashboard-error {
+    color: #dc3545; /* Bootstrap danger text color */
+    background-color: #f8d7da; /* Light red background */
+    border: 1px solid #f5c6cb; /* Reddish border */
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.my-competitions-list {
+  margin-top: 20px;
+}
+
+.my-competition-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Vertically center items if they wrap */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 15px; /* Add gap for wrapped items */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.competition-info {
+  flex-grow: 1; /* Takes up available space */
+  min-width: 250px; /* Prevents info from getting too squished */
+  margin-right: 15px; /* Space between info and actions (optional if using gap) */
+}
+
+.competition-info h3.competition-title {
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: #0056b3; /* Make title stand out */
+  font-size: 1.15em;
+}
+
+.competition-info p {
+  margin: 4px 0;
+  font-size: 0.95em;
+  color: #555;
+}
+
+.competition-info p strong {
+    color: #333;
+}
+
+/* Container for the action buttons */
+.competition-actions {
+  display: flex;
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  gap: 10px; /* Consistent space between buttons */
+  align-items: center; /* Align buttons vertically */
+}
+
+/* Base style for all buttons and links styled as buttons */
+.dashboard-button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none; /* Remove underline from links */
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500; /* Slightly bolder text */
+  text-align: center;
+  transition: background-color 0.2s ease, transform 0.1s ease; /* Add transitions */
+  display: inline-block; /* Ensures links behave like buttons */
+  white-space: nowrap; /* Prevent text wrapping within button */
+}
+
+/* Add a subtle press effect */
+.dashboard-button:active {
+    transform: scale(0.98);
+}
+
+/* --- Specific Button Styles --- */
+
+/* Create New Competition Button */
+.dashboard-button.create {
+  background-color: #28a745; /* Green */
+  color: white;
+  margin-bottom: 20px; /* Add space below if needed */
+}
+.dashboard-button.create:hover {
+  background-color: #218838; /* Darker Green */
+}
+
+/* View Public Page Button */
+.dashboard-button.view {
+  background-color: #007bff; /* Blue */
+  color: white;
+}
+.dashboard-button.view:hover {
+  background-color: #0056b3; /* Darker Blue */
+}
+
+/* Edit Details Button */
+.dashboard-button.edit {
+  background-color: #ffc107; /* Yellow */
+  color: #333; /* Dark text for yellow background */
+}
+.dashboard-button.edit:hover {
+  background-color: #e0a800; /* Darker Yellow */
+}
+
+/* Manage Submissions Button */
+.dashboard-button.manage {
+  background-color: #17a2b8; /* Teal */
+  color: white;
+}
+.dashboard-button.manage:hover {
+  background-color: #117a8b; /* Darker Teal */
+}
+
+/* Delete Button */
+.dashboard-button.delete {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+.dashboard-button.delete:hover {
+  background-color: #c82333; /* Darker Red */
+}
+
+/* Disabled State for Buttons */
+.dashboard-button:disabled {
+  background-color: #6c757d; /* Grey */
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Style for placeholder text when loading or no competitions */
+.dashboard-container p:only-child { /* Targets <p> when it's the only element (e.g., loading/error) */
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-top: 30px;
+}

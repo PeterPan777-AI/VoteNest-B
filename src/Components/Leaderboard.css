@@ -1,0 +1,53 @@
+/* Styles for src/Components/Leaderboard.js */
+
+.leaderboard-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 25px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .leaderboard-header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #343a40;
+    font-size: 2em;
+  }
+  
+  /* Basic Table Styling Placeholder */
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove space between borders */
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .leaderboard-table th,
+  .leaderboard-table td {
+    border: 1px solid #dee2e6;
+    padding: 12px 15px; /* Add good padding */
+    text-align: left;
+  }
+  
+  .leaderboard-table th {
+    background-color: #007bff; /* Header background */
+    color: white;
+    font-weight: bold;
+  }
+  
+  .leaderboard-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa; /* Zebra striping for rows */
+  }
+  
+  .leaderboard-table tbody tr:hover {
+    background-color: #e9ecef; /* Highlight row on hover */
+  }
+  
+  /* Placeholder text if table is empty */
+  .leaderboard-placeholder-text {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 40px 0;
+  }

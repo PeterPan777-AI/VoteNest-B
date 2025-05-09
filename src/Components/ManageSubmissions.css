@@ -1,0 +1,170 @@
+/* src/ManageSubmissions.css */
+
+.manage-submissions-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.manage-submissions-container h2 {
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.navigation-links {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.back-link, .view-public-link {
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.back-link {
+    color: #555;
+    background-color: #eee;
+}
+.back-link:hover {
+    background-color: #ddd;
+}
+
+.view-public-link {
+    color: #fff;
+    background-color: #007bff;
+}
+.view-public-link:hover {
+    background-color: #0056b3;
+}
+
+
+.submissions-list-section h3 {
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.no-submissions-message {
+    color: #777;
+    font-style: italic;
+    background-color: #fff;
+    padding: 15px;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.error-message {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.submissions-list {
+    margin-top: 10px;
+}
+
+.submission-manage-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.submission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.submission-entry-title {
+    margin: 0;
+    font-size: 1.2em;
+    color: #0056b3;
+}
+
+.submission-date {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.submission-details p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.submission-details p strong {
+    color: #333;
+}
+
+.submission-files-manage {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.submission-files-manage strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.submission-files-manage ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.submission-files-manage li {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.submission-file-link {
+    color: #007bff;
+    text-decoration: none;
+    margin-right: 10px;
+}
+.submission-file-link:hover {
+    text-decoration: underline;
+}
+
+.submission-image-thumbnail {
+    max-width: 50px; /* Small thumbnail */
+    max-height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-left: auto; /* Pushes thumbnail to the right */
+}
+
+.submission-manage-actions {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #ccc;
+    text-align: right;
+}
+
+.submission-manage-actions button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    cursor: not-allowed; /* Style disabled buttons */
+}

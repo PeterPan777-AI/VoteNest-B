@@ -1,0 +1,342 @@
+/* src/Components/CompetitionDetails.css */
+/* --- Updated File Content --- */
+
+/* Styles from initial details page */
+.details-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.details-not-found {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  gap: 10px; /* Space between title and button/text */
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.details-title {
+  margin: 0;
+  color: #333;
+  font-size: 1.8em;
+}
+
+.details-actions {
+    display: flex; /* Align items in the actions container */
+    align-items: center;
+    gap: 10px; /* Use gap for spacing between buttons */
+}
+
+.details-submit-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.details-submit-button:hover {
+  background-color: #0056b3;
+}
+
+/* Edit button styling (assuming similar base style or link) */
+.details-edit-button {
+  background-color: #ffc107; /* Example: Yellow/Amber color */
+  color: #212529; /* Dark text for contrast */
+  padding: 8px 15px; /* Adjust padding if needed */
+  border: none;
+  border-radius: 4px;
+  text-decoration: none; /* Remove underline if it's a link */
+  font-size: 0.9em; /* Match delete button? */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-block; /* Ensure it behaves like a button */
+}
+
+.details-edit-button:hover {
+  background-color: #e0a800; /* Darker yellow */
+}
+
+
+.details-cannot-submit-info {
+  color: #6c757d; /* Gray text */
+  font-size: 0.9em;
+  margin: 0; /* Remove default paragraph margin */
+}
+
+.details-cannot-submit-info a {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.details-info-section {
+  margin-bottom: 20px;
+}
+
+.details-section {
+  margin-bottom: 15px;
+}
+
+.details-section strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.details-section p {
+  margin: 0;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Styles for Submissions Section */
+.details-submissions-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.details-submissions-section h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.submission-list {
+  display: grid;
+  gap: 25px;
+  /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */
+}
+
+.submission-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Submission Files (added from previous step) */
+.submission-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px; /* Space between files and content */
+}
+
+.submission-file-link {
+    display: inline-block;
+    max-width: 100%; /* Prevent links from overflowing */
+}
+
+.submission-image-preview {
+  max-width: 150px; /* Control image size */
+  height: auto;
+  max-height: 100px; /* Limit height */
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  border: 1px solid #eee;
+  /* Remove fixed aspect ratio to respect image dimensions better */
+}
+
+.submission-content {
+  flex-grow: 1;
+}
+
+.submission-title {
+  margin: 0 0 8px 0;
+  font-size: 1.2em;
+  color: #0056b3;
+}
+
+.submission-description {
+  margin: 0 0 10px 0;
+  font-size: 0.95em;
+  color: #555;
+  line-height: 1.5;
+}
+
+.submission-meta {
+  font-size: 0.85em;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.submission-meta strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.submission-votes {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-top: 10px;
+}
+
+.details-placeholder-text {
+  color: #888;
+  font-style: italic;
+}
+
+/* --- Vote Button Styling --- */
+.submission-vote-action {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+  text-align: center;
+}
+
+.vote-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.vote-button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.vote-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.vote-login-prompt {
+    margin-left: 10px;
+    font-size: 0.8em;
+    color: #777;
+}
+
+.vote-button.voted {
+  background-color: #6c757d;
+}
+
+.vote-button.voted:hover {
+    background-color: #5a6268;
+}
+
+.submission-item.voted-permanently {
+  /* Optional styling */
+}
+
+/* --- Media Query Adjustments --- */
+@media (min-width: 600px) {
+  .submission-item {
+       display: flex;
+       flex-wrap: wrap;
+       align-items: flex-start;
+       gap: 15px; /* Adjust gap */
+  }
+  .submission-files {
+      flex-basis: 100%; /* Make files container take full width initially */
+      order: 1; /* Show files first */
+  }
+  .submission-image-preview {
+     /* Keep image preview styles from above */
+  }
+   .submission-content {
+       flex-grow: 1;
+       min-width: 200px;
+       order: 2; /* Show content second */
+       margin-bottom: 0;
+   }
+   .submission-vote-action {
+        flex-basis: 100%; /* Vote action takes full width */
+        order: 3; /* Show vote action last */
+        text-align: right;
+        margin-top: 10px; /* Add space above vote action */
+        padding-top: 10px;
+        border-top: 1px dashed #eee; /* Re-add separator */
+   }
+   .vote-login-prompt {
+       display: block;
+       margin-left: 0;
+       margin-top: 5px;
+       text-align: right;
+   }
+}
+
+/* Placeholder for Voting Section */
+.details-voting-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+/* === Error Message Styling === */
+.error-message {
+  color: #721c24; /* Dark red */
+  background-color: #f8d7da; /* Light red background */
+  border: 1px solid #f5c6cb; /* Red border */
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+
+/* === NEW Delete Button Styling (Added) === */
+.details-delete-button {
+  padding: 8px 15px;
+  background-color: #dc3545; /* Red color */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em; /* Match edit button size? Adjust as needed */
+  transition: background-color 0.2s ease;
+}
+
+.details-delete-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+.details-delete-button:disabled {
+  background-color: #f8d7da; /* Lighter red when disabled */
+  color: #721c24;
+  cursor: not-allowed;
+}
+
+/* This rule manages space between buttons in the .details-actions container */
+/* It's already defined above using gap property for flexbox */
+/* .details-actions > * + * { */
+/*     margin-left: 10px; */ /* Can be removed if gap is used consistently */
+/* } */

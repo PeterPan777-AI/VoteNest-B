@@ -1,0 +1,16 @@
+/* src/Components/Register.css */
+
+/* Add this rule (or ensure it exists and has the color property) */
+.register-error-message {
+  color: #dc3545; /* Standard Bootstrap danger red */
+  /* You might also want some margin or padding */
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #f5c6cb; /* Light red border */
+  background-color: #f8d7da; /* Light red background */
+  border-radius: 4px;
+  text-align: center; /* Optional: center the text */
+  font-weight: bold; /* Optional: make it bold */
+}
+
+/* --- Keep your other existing styles for .register-container, .register-form, .form-group, .register-button etc. --- */

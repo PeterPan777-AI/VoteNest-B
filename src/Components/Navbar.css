@@ -1,0 +1,33 @@
+/* Styles for src/Components/Navbar.js */
+
+.navbar {
+    background-color: #333; /* Dark background */
+    padding: 12px 25px; /* Padding top/bottom and left/right */
+    display: flex; /* Use flexbox for horizontal layout */
+    align-items: center; /* Vertically align items in the middle */
+    gap: 20px; /* Space between links */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow below */
+  }
+  
+  .navbar-link {
+    color: white; /* White text color */
+    text-decoration: none; /* Remove underline */
+    font-size: 1rem; /* Standard font size */
+    padding: 5px 0; /* Add some padding for better click area (optional) */
+    border-bottom: 1px solid transparent; /* Prepare for hover effect (NOW 1px) */
+    transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out; /* Smooth transitions */
+  }
+  
+  .navbar-link:hover {
+    color: #ddd; /* Slightly lighter color on hover */
+    border-bottom-color: #ddd; /* Underline effect on hover (will use the 1px thickness) */
+  }
+  
+  /* Optional: Style for the 'active' link if using NavLink later */
+  /*
+  .navbar-link.active {
+    color: #00aaff;
+    border-bottom-color: #00aaff;
+    font-weight: bold;
+  }
+  */

@@ -1,0 +1,69 @@
+/* Styles for src/Components/Login.js */
+
+.login-container {
+    max-width: 400px;
+    margin: 40px auto; /* Center the container with some top margin */
+    padding: 30px; /* Slightly more padding */
+    border: 1px solid #e0e0e0; /* Lighter border */
+    border-radius: 8px; /* More rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* Slightly stronger shadow */
+    text-align: center; /* Center text like the h1 */
+    background-color: #ffffff; /* Ensure white background */
+  }
+  
+  .login-container h1 {
+    margin-bottom: 25px; /* Space below heading */
+    color: #333;
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    gap: 20px; /* Space between form groups */
+  }
+  
+  .login-form-group {
+    display: flex;
+    flex-direction: column; /* Stack label and input */
+    align-items: flex-start; /* Align items to the left */
+    text-align: left; /* Ensure label text is left-aligned */
+  }
+  
+  .login-label {
+    margin-bottom: 8px; /* Space below label */
+    font-weight: bold;
+    color: #555; /* Slightly muted label color */
+    font-size: 0.95em;
+  }
+  
+  .login-input { /* Style for text inputs and select dropdown */
+    width: 100%; /* Make input take full width */
+    padding: 12px; /* Comfortable padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem; /* Standard font size */
+    box-sizing: border-box; /* Include padding and border in element's total width/height */
+  }
+  
+  .login-input:focus {
+    border-color: #007bff; /* Highlight border on focus */
+    outline: none; /* Remove default browser outline */
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Add a subtle glow on focus */
+  }
+  
+  .login-button {
+    padding: 12px 15px;
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 15px; /* Add some space above the button */
+    transition: background-color 0.2s ease-in-out; /* Smooth hover effect */
+  }
+  
+  .login-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
