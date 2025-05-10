@@ -1,5 +1,6 @@
 // backend/server.js
 // --- Full Code Incorporating competitionType, Corrected Eligibility, Cascade Delete, AND NEW SEED DATA ---
+// MODIFIED FOR VERCEL DEPLOYMENT (Corrected Full Version)
 
 const express = require('express');
 const cors = require('cors');
@@ -14,36 +15,62 @@ const fs = require('fs');
 const multer = require('multer');
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+// const PORT = process.env.PORT || 5001; // PORT is managed by Vercel
 
 // --- Configuration Constants ---
-const JWT_SECRET = 'your_super_secret_random_string_123!@#'; // CHANGE IN PRODUCTION!
+// Use environment variables for secrets, with fallbacks for local development
+const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_random_string_123!@#';
 const UPLOADS_DIR = 'uploads';
-const MONGODB_URI = 'mongodb+srv://peterpawlak:080HsxwzFEuy6QOV@cluster0.lwfm7ij.mongodb.net/competitionAppDb?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://peterpawlak:080HsxwzFEuy6QOV@cluster0.lwfm7ij.mongodb.net/competitionAppDb?retryWrites=true&w=majority';
 const ALLOWED_BACKEND_EXTENSIONS = ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.pdf', '.doc', '.docx', '.txt', '.mp3', '.wav', '.ogg', '.m4a', '.mp4', '.avi', '.mov', '.mkv', '.webm'];
 const BACKEND_MAX_FILE_SIZE_BYTES = 300 * 1024 * 1024; // 300MB
 
-// --- Setup Uploads Directory ---
+// --- Setup Uploads Directory (Modified for Vercel) ---
 const uploadsDirPath = path.join(__dirname, UPLOADS_DIR);
+// TODO: Long-term solution for file uploads on Vercel should use Vercel Blob, S3, or similar,
+// as /tmp is temporary and local 'uploads' dir isn't writable or persistent for new uploads in serverless.
 if (!fs.existsSync(uploadsDirPath)) {
     try {
-        fs.mkdirSync(uploadsDirPath);
-        console.log(`Uploads directory created at: ${uploadsDirPath}`);
+        if (process.env.VERCEL) {
+            // On Vercel, the function's root filesystem is read-only except /tmp
+            console.warn(`On Vercel, local '${UPLOADS_DIR}' directory cannot be created in function root if it doesn't exist.`);
+            console.warn(`Dynamic file uploads should target '/tmp' or a cloud storage service.`);
+        } else {
+            // For local development, create it if it doesn't exist
+            fs.mkdirSync(uploadsDirPath, { recursive: true });
+            console.log(`Uploads directory created at: ${uploadsDirPath}`);
+        }
     } catch (err) {
-        console.error(`Error creating uploads directory: ${err}`);
-        process.exit(1);
+        console.error(`Warning: Could not create uploads directory '${uploadsDirPath}': ${err.message}.`);
+        // Do NOT process.exit(1) here for Vercel, let the app attempt to continue.
+        // File uploads relying on this directory might fail if it's not creatable.
     }
 }
 
 // --- Core Middleware ---
 app.use(cors());
 app.use(express.json());
+// This serves files from the 'uploads' directory if they were part of the deployment bundle
+// or created locally. For files uploaded to /tmp on Vercel, this won't serve them.
 app.use('/uploads', express.static(uploadsDirPath));
 
-// --- Multer Configuration ---
+// --- Multer Configuration (Modified for Vercel) ---
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, uploadsDirPath);
+        // On Vercel, save to /tmp as it's a writable directory
+        const destPath = process.env.VERCEL ? '/tmp' : uploadsDirPath;
+
+        // Ensure destination exists (especially /tmp on Vercel, or local dir)
+        if ((process.env.VERCEL && !fs.existsSync(destPath)) || (!process.env.VERCEL && !fs.existsSync(destPath))) {
+            try {
+                fs.mkdirSync(destPath, { recursive: true });
+                console.log(`Multer destination directory ${destPath} ensured/created.`);
+            } catch (e) {
+                console.error(`Multer critical error: Failed to create destination directory ${destPath}:`, e);
+                return cb(e); // Pass error to multer
+            }
+        }
+        cb(null, destPath);
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -69,11 +96,17 @@ const upload = multer({
 mongoose.connect(MONGODB_URI)
     .then(() => {
         console.log("MongoDB Atlas connected successfully.");
-        seedInitialData(); // Seed data after successful connection
+        // Conditionally run seed data, perhaps not on every Vercel invocation unless intended
+        if (process.env.NODE_ENV !== 'production' || process.env.SEED_ON_STARTUP === 'true') {
+            console.log("Attempting to seed initial data (if necessary)...");
+            seedInitialData();
+        } else {
+            console.log("Skipping data seeding in production or by configuration.");
+        }
     })
     .catch(err => {
         console.error('MongoDB Atlas connection error:', err);
-        process.exit(1);
+        // process.exit(1); // Avoid process.exit in serverless, it can hide errors from Vercel logs
     });
 
 
@@ -103,10 +136,10 @@ async function seedInitialData() {
         for (const userData of usersToSeed) {
             let user = await User.findOne({ $or: [{ email: userData.email }, { username: userData.username }] });
             if (!user) {
-                console.log(`Creating Seed User: ${userData.username} (${userData.role})`);
+                console.log(`SEEDING: Creating Seed User: ${userData.username} (${userData.role})`);
                 user = new User(userData);
                 await user.save();
-                console.log(`Seed User ${userData.username} created.`);
+                console.log(`SEEDING: Seed User ${userData.username} created.`);
             }
             if (userData.username === 'SeedAdmin') dbAdminUser = user;
             if (userData.username === 'SeedBizUser') dbBusinessUser = user;
@@ -114,32 +147,32 @@ async function seedInitialData() {
         }
 
         if (!dbAdminUser || !dbBusinessUser || !dbIndividualUser) {
-            console.warn("One or more seed users (Admin, Business, Individual) not assigned during loop. Attempting to re-fetch from DB...");
+            console.warn("SEEDING: One or more seed users (Admin, Business, Individual) not assigned during loop. Attempting to re-fetch from DB...");
             if (!dbAdminUser) dbAdminUser = await User.findOne({ username: 'SeedAdmin' });
             if (!dbBusinessUser) dbBusinessUser = await User.findOne({ username: 'SeedBizUser' });
             if (!dbIndividualUser) dbIndividualUser = await User.findOne({ username: 'SeedIndUser' });
 
              if (!dbAdminUser || !dbBusinessUser || !dbIndividualUser) {
-                console.error("CRITICAL: One or more seed users still not found after re-fetch. Aborting competition seeding.");
+                console.error("SEEDING CRITICAL: One or more seed users still not found after re-fetch. Aborting competition seeding.");
                 return;
              }
         }
-        console.log("Verified essential seed users for competition creation:");
-        if(dbAdminUser) console.log(`  Admin User ID: ${dbAdminUser._id}`); else console.error("  Admin User not found!");
-        if(dbBusinessUser) console.log(`  Business User ID: ${dbBusinessUser._id}`); else console.error("  Business User not found!");
-        if(dbIndividualUser) console.log(`  Individual User ID: ${dbIndividualUser._id}`); else console.error("  Individual User not found!");
+        console.log("SEEDING: Verified essential seed users for competition creation:");
+        if(dbAdminUser) console.log(`SEEDING:   Admin User ID: ${dbAdminUser._id}`); else console.error("SEEDING:   Admin User not found!");
+        if(dbBusinessUser) console.log(`SEEDING:   Business User ID: ${dbBusinessUser._id}`); else console.error("SEEDING:   Business User not found!");
+        if(dbIndividualUser) console.log(`SEEDING:   Individual User ID: ${dbIndividualUser._id}`); else console.error("SEEDING:   Individual User not found!");
 
         // --- Seed Competitions (only if competition collection is empty) ---
         const competitionCount = await Competition.countDocuments();
         if (competitionCount === 0) {
-            console.log("Competitions collection is empty. Seeding new list of competitions...");
+            console.log("SEEDING: Competitions collection is empty. Seeding new list of competitions...");
 
             const now = Date.now();
             const oneDay = 24 * 60 * 60 * 1000;
 
             // Ensure all user IDs are valid before proceeding
             if (!dbBusinessUser?._id || !dbIndividualUser?._id || !dbAdminUser?._id) {
-                console.error("CRITICAL: Not all seed user IDs are available. Cannot create competitions. Check user seeding logs.");
+                console.error("SEEDING CRITICAL: Not all seed user IDs are available. Cannot create competitions. Check user seeding logs.");
                 return;
             }
             
@@ -204,7 +237,7 @@ async function seedInitialData() {
                     title: "New Music Score Challenge (Standard)",
                     description: "Submit your original musical compositions. Open to Individuals.",
                     shortId: slugify("New Music Score Challenge Autumn"),
-                    createdBy: dbIndividualUser._id, // Ideally Admin should create Standard comps
+                    createdBy: dbAdminUser._id, // Changed to Admin to be consistent with rules
                     competitionType: 'Standard', // ADDED
                     status: 'open',
                     endDate: new Date(now + 35 * oneDay)
@@ -213,7 +246,7 @@ async function seedInitialData() {
                     title: "Best Lyrics - Music or Poetry (Standard)",
                     description: "Share your most impactful song lyrics or original poetry. For Individuals.",
                     shortId: slugify("Lyrical Masters Contest"),
-                    createdBy: dbIndividualUser._id, // Ideally Admin
+                    createdBy: dbAdminUser._id, // Changed to Admin
                     competitionType: 'Standard', // ADDED
                     status: 'voting',
                     endDate: new Date(now - 3 * oneDay)
@@ -222,7 +255,7 @@ async function seedInitialData() {
                     title: "Cutest Cat Photo Contest (Standard)",
                     description: "Let's see those adorable cat pictures! Open for Individual submissions.",
                     shortId: slugify("Cutest Cat Photo Contest Fall"),
-                    createdBy: dbIndividualUser._id, // Ideally Admin
+                    createdBy: dbAdminUser._id, // Changed to Admin
                     competitionType: 'Standard', // ADDED
                     status: 'open',
                     endDate: new Date(now + 10 * oneDay)
@@ -231,7 +264,7 @@ async function seedInitialData() {
                     title: "Cutest Dog Photo Contest (Standard)",
                     description: "Show off your charming canine companions. Individual entries.",
                     shortId: slugify("Cutest Dog Photo Contest Fall"),
-                    createdBy: dbIndividualUser._id, // Ideally Admin
+                    createdBy: dbAdminUser._id, // Changed to Admin
                     competitionType: 'Standard', // ADDED
                     status: 'open',
                     endDate: new Date(now + 12 * oneDay)
@@ -240,7 +273,7 @@ async function seedInitialData() {
                     title: "Funniest Pet Video Awards (Standard)",
                     description: "Submit your most hilarious pet moments. Open to Individuals.",
                     shortId: slugify("Funniest Pet Video Awards 2024"),
-                    createdBy: dbIndividualUser._id, // Ideally Admin
+                    createdBy: dbAdminUser._id, // Changed to Admin
                     competitionType: 'Standard', // ADDED
                     status: 'closed',
                     endDate: new Date(now - 25 * oneDay)
@@ -249,7 +282,7 @@ async function seedInitialData() {
                     title: "Best DIY Craft vs. Art Showdown (Standard)",
                     description: "Is it craft, or is it art? Show us your best! Individual submissions.",
                     shortId: slugify("DIY Craft Art Showdown"),
-                    createdBy: dbIndividualUser._id, // Ideally Admin
+                    createdBy: dbAdminUser._id, // Changed to Admin
                     competitionType: 'Standard', // ADDED
                     status: 'upcoming',
                     endDate: new Date(now + 50 * oneDay)
@@ -275,23 +308,23 @@ async function seedInitialData() {
                 }
             ];
             
-            console.log(`Attempting to seed ${competitionsToSeed.length} competitions...`);
+            console.log(`SEEDING: Attempting to seed ${competitionsToSeed.length} competitions...`);
             await Competition.insertMany(competitionsToSeed);
-            console.log(`Seeding complete. ${competitionsToSeed.length} competitions added.`);
+            console.log(`SEEDING: Seeding complete. ${competitionsToSeed.length} competitions added.`);
 
         } else {
-            // console.log("Competitions collection is not empty. Skipping competition seeding.");
+            // console.log("SEEDING: Competitions collection is not empty. Skipping competition seeding.");
         }
 
     } catch (error) {
         if (error.code === 11000) { // Duplicate key error
-             console.warn("Skipping seeding for duplicate entry (likely already exists). If this is unexpected, check your shortIds for uniqueness.");
+             console.warn("SEEDING: Skipping seeding for duplicate entry (likely already exists). If this is unexpected, check your shortIds for uniqueness.");
         } else if (error.name === 'ValidationError') {
-            console.error('ValidationError during seeding (often due to schema mismatch, check Competition model and seed data):', error.message);
+            console.error('SEEDING: ValidationError during seeding (often due to schema mismatch, check Competition model and seed data):', error.message);
             Object.values(error.errors).forEach(errDetail => console.error(`  - Path: '${errDetail.path}', Value: '${errDetail.value}', Message: ${errDetail.message}`));
         }
         else {
-            console.error('Error during initial data seeding:', error);
+            console.error('SEEDING: Error during initial data seeding:', error);
         }
     }
 }
@@ -300,7 +333,6 @@ async function seedInitialData() {
 
 // --- Helper Functions ---
 const generateToken = (user) => {
-    // ... (rest of generateToken function - no changes)
     if (!user || !user._id || !user.username || !user.role) {
         console.error("Error generating token: Invalid user object provided.", user);
         return null;
@@ -320,7 +352,6 @@ const generateToken = (user) => {
 
 // --- Authentication Middleware ---
 const authenticateToken = (req, res, next) => {
-    // ... (rest of authenticateToken function - no changes)
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -343,7 +374,6 @@ const authenticateToken = (req, res, next) => {
 
 // --- Admin Check Middleware ---
 const isAdmin = (req, res, next) => {
-    // ... (rest of isAdmin function - no changes)
     if (!req.user || req.user.role !== 'Admin') {
         return res.status(403).json({ message: 'Forbidden: Administrator access required.' });
     }
@@ -358,7 +388,6 @@ app.get('/api/ping', (req, res) => {
 
 // --- User Authentication Routes ---
 app.post('/api/auth/register', async (req, res) => {
-    // ... (rest of register route - no changes)
     const { username, email, password, role } = req.body;
 
     if (!username || !email || !password || !role) {
@@ -394,7 +423,6 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 app.post('/api/auth/login', async (req, res) => {
-    // ... (rest of login route - no changes)
     const { identifier, password } = req.body;
 
     if (!identifier || !password) {
@@ -431,7 +459,6 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // --- Admin Routes ---
-// ... (Admin routes - /api/admin/check, /api/admin/users, /api/admin/users/:userIdToDelete, /api/admin/users/:userIdToUpdate - no functional changes regarding competitionType)
 app.get('/api/admin/check', authenticateToken, isAdmin, (req, res) => {
     res.json({ message: `Welcome Admin ${req.user.username}! You have admin privileges.`, adminData: req.user });
 });
@@ -446,6 +473,37 @@ app.get('/api/admin/users', authenticateToken, isAdmin, async (req, res) => {
         res.status(500).json({ message: 'Server error fetching user list.' });
     }
 });
+
+// Helper function for cleaning up files - to be used carefully with Vercel /tmp
+const cleanupUploadedFile = (filePathForCleanup) => {
+    try {
+        if (fs.existsSync(filePathForCleanup)) {
+            fs.unlinkSync(filePathForCleanup);
+            console.log(`Successfully deleted file: ${filePathForCleanup}`);
+        } else {
+            console.warn(`File not found for deletion, skipping: ${filePathForCleanup}`);
+        }
+    } catch (fileErr) {
+        console.error(`Error deleting file ${filePathForCleanup}:`, fileErr);
+    }
+};
+
+// Modified helper to determine file path for deletion based on stored URL and environment
+const getFilePathForDeletion = (fileUrl) => {
+    const filename = path.basename(fileUrl);
+    if (process.env.VERCEL) {
+        // If files were stored with a prefix indicating /tmp or directly as /tmp paths (needs consistency)
+        // This assumes fileUrl for Vercel temp files might be stored differently or need interpretation
+        // For now, if multer saved to /tmp, and fileUrl is /uploads/filename, this is mismatched.
+        // Let's assume for deletion, if on Vercel, the target is /tmp/filename
+        // This needs careful alignment with how file URLs are stored vs. actual multer save path
+        return path.join('/tmp', filename);
+    } else {
+        // For local, it's relative to uploadsDirPath
+        return path.join(uploadsDirPath, filename);
+    }
+};
+
 
 app.delete('/api/admin/users/:userIdToDelete', authenticateToken, isAdmin, async (req, res) => {
     const { userIdToDelete } = req.params;
@@ -490,24 +548,16 @@ app.delete('/api/admin/users/:userIdToDelete', authenticateToken, isAdmin, async
                     for (const sub of submissionsToDelete) {
                         if (sub.fileUrls && sub.fileUrls.length > 0) {
                             for (const fileUrl of sub.fileUrls) {
-                                try {
-                                    const filename = path.basename(fileUrl);
-                                    const filePath = path.join(uploadsDirPath, filename);
-                                    if (fs.existsSync(filePath)) {
-                                        fs.unlinkSync(filePath);
-                                        deletedFileCount++;
-                                        console.log(`    Deleted file: ${filePath}`);
-                                    } else {
-                                        console.warn(`    File not found, skipping deletion: ${filePath}`);
-                                    }
-                                } catch (fileErr) {
-                                    console.error(`    Error deleting file ${fileUrl} for submission ${sub._id}:`, fileErr);
-                                    contentDeletionErrors.push(`File deletion failed for sub ${sub._id} (comp ${compId}): ${fileErr.message}`);
-                                }
+                                // fileUrl is like '/uploads/filename.ext'
+                                // On Vercel, multer saves to /tmp/filename.ext
+                                // The file path for deletion needs to account for this if on Vercel
+                                const actualFilePath = getFilePathForDeletion(fileUrl);
+                                cleanupUploadedFile(actualFilePath);
+                                deletedFileCount++;
                             }
                         }
                     }
-                    if (deletedFileCount > 0) console.log(`   Deleted ${deletedFileCount} associated files for competition ${compId}.`);
+                    if (deletedFileCount > 0) console.log(`   Attempted deletion of ${deletedFileCount} associated files for competition ${compId}.`);
                     if (submissionsToDelete.length > 0) {
                         const deleteSubResult = await Submission.deleteMany({ competitionId: compId });
                         console.log(`   Deleted ${deleteSubResult.deletedCount} submission documents for competition ${compId}.`);
@@ -581,11 +631,10 @@ app.put('/api/admin/users/:userIdToUpdate', authenticateToken, isAdmin, async (r
 
 // --- User-Specific Routes ---
 app.get('/api/users/me/competitions', authenticateToken, async (req, res) => {
-    // ... (no changes)
     const userId = req.user.userId;
     try {
         const userCompetitions = await Competition.find({ createdBy: userId })
-            .select('title description status endDate shortId _id createdAt competitionType') // Added competitionType
+            .select('title description status endDate shortId _id createdAt competitionType') 
             .sort({ createdAt: -1 });
         res.status(200).json(userCompetitions);
     } catch (error) {
@@ -596,10 +645,9 @@ app.get('/api/users/me/competitions', authenticateToken, async (req, res) => {
 
 // --- Competition Routes ---
 app.get('/api/competitions', async (req, res) => {
-    // ... (no changes other than selecting competitionType for consistency)
     try {
         const competitions = await Competition.find()
-            .select('title description status endDate shortId createdAt createdBy submissions competitionType') // Added competitionType
+            .select('title description status endDate shortId createdAt createdBy submissions competitionType') 
             .populate({ path: 'createdBy', model: 'User', select: 'username role _id' })
             .sort({ endDate: 1 });
         res.status(200).json(competitions);
@@ -610,7 +658,6 @@ app.get('/api/competitions', async (req, res) => {
 });
 
 app.get('/api/competitions/:competitionId', async (req, res) => {
-    // ... (no changes other than selecting competitionType for consistency)
     const { competitionId } = req.params;
     let competition = null;
     try {
@@ -625,13 +672,13 @@ app.get('/api/competitions/:competitionId', async (req, res) => {
 
         if (mongoose.Types.ObjectId.isValid(competitionId)) {
             competition = await Competition.findById(competitionId)
-                .select('+competitionType') // Ensure competitionType is selected
+                .select('+competitionType') 
                 .populate(populateSubmissionsConfig)
                 .populate(populateCreatorConfig);
         }
         if (!competition) {
             competition = await Competition.findOne({ shortId: competitionId })
-                .select('+competitionType') // Ensure competitionType is selected
+                .select('+competitionType') 
                 .populate(populateSubmissionsConfig)
                 .populate(populateCreatorConfig);
         }
@@ -646,27 +693,24 @@ app.get('/api/competitions/:competitionId', async (req, res) => {
 
 // --- Create Competition Route ---
 app.post('/api/competitions', authenticateToken, async (req, res) => {
-    // *** UPDATED to handle competitionType ***
     if (req.user.role !== 'Business' && req.user.role !== 'Admin') {
         return res.status(403).json({ message: 'Forbidden: Only Business or Admin users can create competitions.' });
     }
-    // Added competitionType to destructuring
     const { title, description, endDate, shortId: userProvidedShortId, status: userProvidedStatus, competitionType: userProvidedCompetitionType } = req.body;
 
     if (!title || !description || !endDate || !userProvidedShortId) {
         return res.status(400).json({ message: 'Title, description, end date, and short ID are required.' });
     }
 
-    let finalCompetitionType = 'Standard'; // Default for safety
+    let finalCompetitionType = 'Standard'; 
     if (req.user.role === 'Business') {
-        finalCompetitionType = 'Business'; // Businesses always create 'Business' type competitions
+        finalCompetitionType = 'Business'; 
     } else if (req.user.role === 'Admin') {
         if (!userProvidedCompetitionType || !['Standard', 'Business'].includes(userProvidedCompetitionType)) {
             return res.status(400).json({ message: "Admin must specify a valid competition type ('Standard' or 'Business')." });
         }
         finalCompetitionType = userProvidedCompetitionType;
     } else {
-        // Should not happen due to initial role check, but as a safeguard:
         return res.status(403).json({ message: "Forbidden: Your role cannot create competitions."});
     }
 
@@ -697,7 +741,7 @@ app.post('/api/competitions', authenticateToken, async (req, res) => {
             shortId: generatedShortId,
             createdBy: req.user.userId,
             status: competitionStatus,
-            competitionType: finalCompetitionType // SAVE the competitionType
+            competitionType: finalCompetitionType 
         });
         const savedCompetition = await newCompetition.save();
         res.status(201).json(savedCompetition);
@@ -713,10 +757,8 @@ app.post('/api/competitions', authenticateToken, async (req, res) => {
 });
 
 app.put('/api/competitions/:competitionId', authenticateToken, async (req, res) => {
-    // *** UPDATED to handle competitionType for Admins ***
     const { competitionId } = req.params;
     const { userId, role: userRole } = req.user;
-    // Added competitionType to destructuring for potential updates
     const { title, description, endDate, status, competitionType: newCompetitionType } = req.body;
 
     const updateData = {};
@@ -725,7 +767,6 @@ app.put('/api/competitions/:competitionId', authenticateToken, async (req, res) 
     if (endDate !== undefined) updateData.endDate = endDate;
     if (status !== undefined) updateData.status = status;
 
-    // Only Admins can change competitionType after creation
     if (userRole === 'Admin' && newCompetitionType !== undefined) {
         if (!['Standard', 'Business'].includes(newCompetitionType)) {
             return res.status(400).json({ message: "Invalid competition type. Must be 'Standard' or 'Business'." });
@@ -742,7 +783,7 @@ app.put('/api/competitions/:competitionId', authenticateToken, async (req, res) 
         parsedEndDate = new Date(updateData.endDate);
         if (isNaN(parsedEndDate)) errors.push('Invalid end date format.');
         else {
-            updateData.endDate = parsedEndDate; // Assign here, check logic below with competition context
+            updateData.endDate = parsedEndDate; 
         }
     }
     if (updateData.status) {
@@ -761,20 +802,16 @@ app.put('/api/competitions/:competitionId', authenticateToken, async (req, res) 
         const isAdminUser = userRole === 'Admin';
         if (!isCreator && !isAdminUser) return res.status(403).json({ message: 'Forbidden: You are not authorized to edit this competition.' });
         
-        // If Business user (not admin) tries to change competitionType
         if (isCreator && userRole === 'Business' && updateData.competitionType && updateData.competitionType !== 'Business') {
             return res.status(403).json({ message: 'Business users cannot change their competition type away from "Business".' });
         }
 
-
-        // End date validation logic (combined with status)
         if (updateData.endDate) {
             const finalStatus = updateData.status || competition.status;
             if (new Date(updateData.endDate) < new Date().setHours(0,0,0,0) && finalStatus !== 'closed' && finalStatus !== 'voting') {
                 return res.status(400).json({ message: "End Date must be today or in the future unless current/target status is 'closed' or 'voting'." });
             }
         }
-
 
         if (updateData.title && updateData.title !== competition.title) {
             const existingByTitle = await Competition.findOne({ title: updateData.title, _id: { $ne: competition._id } });
@@ -798,7 +835,6 @@ app.put('/api/competitions/:competitionId', authenticateToken, async (req, res) 
 });
 
 app.delete('/api/competitions/:competitionId', authenticateToken, async (req, res) => {
-    // ... (rest of delete competition route - no changes)
     const { competitionId } = req.params;
     const { userId, role: userRole } = req.user;
     try {
@@ -817,21 +853,16 @@ app.delete('/api/competitions/:competitionId', authenticateToken, async (req, re
         for (const sub of submissionsToDelete) {
             if (sub.fileUrls && sub.fileUrls.length > 0) {
                 for (const fileUrl of sub.fileUrls) {
-                    try {
-                        const filename = path.basename(fileUrl);
-                        const filePath = path.join(uploadsDirPath, filename);
-                        if (fs.existsSync(filePath)) {
-                            fs.unlinkSync(filePath);
-                            deletedFileCount++; console.log(` Deleted file: ${filePath}`);
-                        } else console.warn(` File not found for deletion: ${filePath}`);
-                    } catch (fileErr) { console.error(` Error deleting file ${fileUrl} for sub ${sub._id}:`, fileErr); }
+                    const actualFilePath = getFilePathForDeletion(fileUrl);
+                    cleanupUploadedFile(actualFilePath);
+                    deletedFileCount++;
                 }
             }
         }
         if (submissionsToDelete.length > 0) {
              const deleteResult = await Submission.deleteMany({ competitionId: competition._id });
              deletedSubCount = deleteResult.deletedCount;
-             console.log(`Deleted ${deletedSubCount} submission documents and ${deletedFileCount} files.`);
+             console.log(`Deleted ${deletedSubCount} submission documents and attempted deletion of ${deletedFileCount} files.`);
         } else console.log(`No submissions found for competition ${competition._id}.`);
 
         await Competition.findByIdAndDelete(competition._id);
@@ -845,11 +876,10 @@ app.delete('/api/competitions/:competitionId', authenticateToken, async (req, re
 
 // --- Submission Routes ---
 app.get('/api/submissions', async (req, res) => {
-    // ... (no changes here)
     try {
         const submissions = await Submission.find()
             .populate({ path: 'userId', model: 'User', select: 'username _id role'})
-            .populate({ path: 'competitionId', model: 'Competition', select: 'title shortId _id status competitionType'}) // Added competitionType
+            .populate({ path: 'competitionId', model: 'Competition', select: 'title shortId _id status competitionType'}) 
             .sort({ submissionDate: -1 });
         res.status(200).json(submissions);
     } catch (error) {
@@ -859,7 +889,6 @@ app.get('/api/submissions', async (req, res) => {
 });
 
 app.get('/api/competitions/:competitionId/submissions', authenticateToken, async (req, res) => {
-    // ... (no changes here)
     const { competitionId } = req.params;
     const { userId: requestingUserId, role: requestingUserRole } = req.user;
     try {
@@ -885,7 +914,6 @@ app.get('/api/competitions/:competitionId/submissions', authenticateToken, async
 
 // --- Create Submission Route ---
 app.post('/api/competitions/:competitionId/submissions', authenticateToken, (req, res, next) => {
-    // ... (Multer middleware part unchanged)
     const uploader = upload.array('submissionFiles', 5);
     uploader(req, res, function (err) {
         if (err instanceof multer.MulterError) {
@@ -901,22 +929,17 @@ app.post('/api/competitions/:competitionId/submissions', authenticateToken, (req
     });
 },
 async (req, res) => {
-    // *** UPDATED with new submission eligibility logic ***
     const { competitionId } = req.params;
     const { entryTitle, description } = req.body;
-    const { userId, username, role: submitterRole } = req.user; // submitterRole is key
+    const { userId, username, role: submitterRole } = req.user; 
     const files = req.files;
 
     const cleanupFilesOnError = (filesToClean) => {
-        // ... (cleanupFilesOnError unchanged)
         if (filesToClean && filesToClean.length > 0) {
             console.warn(`cleanupFilesOnError: Cleaning up ${filesToClean.length} files...`);
             filesToClean.forEach(file => {
-                try {
-                    if (fs.existsSync(file.path)) {
-                        fs.unlinkSync(file.path); console.log(`cleanupFilesOnError: Deleted: ${file.path}`);
-                    } else console.warn(`cleanupFilesOnError: File not found: ${file.path}`);
-                } catch (cleanupErr) { console.error(`cleanupFilesOnError: Error cleaning ${file.path}:`, cleanupErr); }
+                // file.path is from multer, e.g., /tmp/filename.ext on Vercel
+                cleanupUploadedFile(file.path);
             });
         }
     };
@@ -926,8 +949,7 @@ async (req, res) => {
 
     let targetCompetition = null;
     try {
-        // Fetch competition including its 'status' and 'competitionType'
-        const selectFields = 'status competitionType createdBy'; // Ensure these are selected
+        const selectFields = 'status competitionType createdBy'; 
         if (mongoose.Types.ObjectId.isValid(competitionId)) {
             targetCompetition = await Competition.findById(competitionId).select(selectFields);
         }
@@ -946,7 +968,7 @@ async (req, res) => {
         let isEligible = false;
         let rejectionReason = 'Submission restricted due to eligibility rules.';
 
-        if (submitterRole === 'Admin') { // Admins can submit to any for testing
+        if (submitterRole === 'Admin') { 
             isEligible = true;
         } else if (submitterRole === 'Individual') {
             if (targetCompetition.competitionType === 'Standard') {
@@ -976,7 +998,18 @@ async (req, res) => {
              return res.status(400).json({ message: 'You have already submitted to this competition.' });
         }
 
-        const fileUrls = files.map(file => `/${UPLOADS_DIR}/${file.filename}`);
+        // IMPORTANT: File URLs for Vercel
+        // If files are in /tmp, they are temporary and not directly servable via '/uploads/filename'.
+        // The URL stored should ideally be a persistent URL after uploading to Blob storage.
+        // For now, we'll form a URL based on UPLOADS_DIR, but this needs a proper Vercel storage strategy.
+        const fileUrls = files.map(file => {
+            // file.filename is 'file-uniquesuffix.ext'
+            // Locally, this is served from /uploads/file-uniquesuffix.ext
+            // On Vercel, the file is at /tmp/file-uniquesuffix.ext and NOT served by /uploads/...
+            // This URL will be broken on Vercel until a proper serving/storage mechanism is in place.
+            return `/${UPLOADS_DIR}/${file.filename}`;
+        });
+
         const newSubmission = new Submission({
             competitionId: targetCompetition._id, userId, username,
             entryTitle: entryTitle.trim(), description: description.trim(), fileUrls
@@ -999,18 +1032,16 @@ async (req, res) => {
 
 // --- Vote on Submission Route ---
 app.post('/api/submissions/:submissionId/vote', authenticateToken, async (req, res) => {
-    // *** UPDATED with new voting eligibility logic ***
     const { submissionId } = req.params;
-    const { userId, role: voterRole } = req.user; // voterRole is key
+    const { userId, role: voterRole } = req.user; 
 
     if (!mongoose.Types.ObjectId.isValid(submissionId)) return res.status(400).json({ message: 'Invalid submission ID.' });
 
     try {
-        // Populate competitionId with status AND competitionType
         const submission = await Submission.findById(submissionId)
             .populate({ 
                 path: 'competitionId', 
-                select: 'status _id competitionType' // Ensure competitionType is selected
+                select: 'status _id competitionType' 
             });
 
         if (!submission) return res.status(404).json({ message: 'Submission not found.' });
@@ -1027,9 +1058,9 @@ app.post('/api/submissions/:submissionId/vote', authenticateToken, async (req, r
         let canVote = false;
         let voteRejectionReason = 'Voting restricted due to eligibility rules.';
 
-        if (voterRole === 'Admin') { // Admins can vote for testing
+        if (voterRole === 'Admin') { 
             canVote = true;
-        } else if (voterRole === 'Individual') { // Individuals can vote on any type
+        } else if (voterRole === 'Individual') { 
             canVote = true;
         } else if (voterRole === 'Business') {
             if (competitionTypeOfSubmission === 'Business') {
@@ -1054,7 +1085,7 @@ app.post('/api/submissions/:submissionId/vote', authenticateToken, async (req, r
             { new: true }
         );
         if (!updatedSubmission) return res.status(404).json({ message: 'Submission not found during vote update.' });
-        res.status(200).json({ message: 'Vote recorded!', newVoteCount: updatedSubmission.voteCount, submission: updatedSubmission }); // Return updated submission for clarity
+        res.status(200).json({ message: 'Vote recorded!', newVoteCount: updatedSubmission.voteCount, submission: updatedSubmission }); 
     } catch (error) {
         console.error("Vote Error:", error);
          if (error.name === 'CastError') return res.status(500).json({ message: 'Error retrieving competition data for voting.' });
@@ -1064,7 +1095,6 @@ app.post('/api/submissions/:submissionId/vote', authenticateToken, async (req, r
 
 // --- Global Error Handling Middleware ---
 app.use((err, req, res, next) => {
-    // ... (Global error handler - no changes)
     console.error("Global Error Handler Caught:", err.stack || err);
     if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ message: `File too large. Max ${BACKEND_MAX_FILE_SIZE_BYTES / 1024 / 1024}MB.` });
@@ -1081,7 +1111,13 @@ app.use((err, req, res, next) => {
     if (!res.headersSent) res.status(500).json({ message: 'Unexpected server error.' });
 });
 
-// --- Start Server ---
-app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
+// --- Vercel expects the app to be exported for serverless functions ---
+module.exports = app;
+
+// --- Original Server Start (Commented out for Vercel) ---
+/*
+const ORIGINAL_PORT = process.env.PORT || 5001; // Renamed to avoid conflict if PORT is set by Vercel
+app.listen(ORIGINAL_PORT, () => {
+    console.log(`Backend server running on http://localhost:${ORIGINAL_PORT}`);
 });
+*/
