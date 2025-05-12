@@ -1,6 +1,6 @@
 // backend/models/Competition.js
 // --- Full Replacement Code ---
-// --- Added 'competitionType' field ---
+// --- Added 'category' field and index ---
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
@@ -27,7 +27,13 @@ const competitionSchema = new Schema({
         trim: true,
         match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Short ID can only contain lowercase letters, numbers, and hyphens, and cannot start or end with a hyphen.']
     },
-    status: { // This manages the lifecycle (e.g., open, voting, closed)
+    // *** NEW: Reference to the Category model ***
+    category: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category', // This MUST match the model name ('Category') we created
+        required: [true, 'Competition category is required.']
+    },
+    status: {
         type: String,
         required: [true, 'Competition status is required.'],
         enum: {
@@ -36,17 +42,14 @@ const competitionSchema = new Schema({
         },
         default: 'open'
     },
-    // *** THIS FIELD defines the AUDIENCE/NATURE of the competition ***
     competitionType: {
         type: String,
         required: [true, 'Competition type is required.'],
         enum: {
-            values: ['Standard', 'Business'], // 'Standard' for general/individual, 'Business' for business-focused
+            values: ['Standard', 'Business'],
             message: 'Invalid competition type: {VALUE} is not supported. Allowed types are Standard, Business.'
         },
-        // When Admin creates, they'll choose. When Business creates, it's auto 'Business'.
-        // A default might be 'Standard', or you might require it explicitly.
-        default: 'Standard' 
+        default: 'Standard'
     },
     endDate: {
         type: Date,
@@ -65,10 +68,12 @@ const competitionSchema = new Schema({
     timestamps: true
 });
 
+// Indexes
 competitionSchema.index({ status: 1 });
 competitionSchema.index({ endDate: 1 });
 competitionSchema.index({ createdBy: 1 });
-competitionSchema.index({ competitionType: 1 }); // Index the new field
+competitionSchema.index({ competitionType: 1 });
+competitionSchema.index({ category: 1 }); // Index the new category field
 
 const Competition = mongoose.model('Competition', competitionSchema);
 

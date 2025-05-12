@@ -1,11 +1,10 @@
 // src/components/Navbar.js
 // --- Full Replacement Code ---
-// --- Uses react-bootstrap for responsive navigation ---
-// --- *** UNCOMMENTED Profile Link *** ---
+// --- Added console.log for debugging user object ---
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../Context/AuthContext';
+import { useAuth } from '../Context/AuthContext'; // Adjust path if needed
 // Import necessary components from react-bootstrap
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -14,6 +13,11 @@ import Button from 'react-bootstrap/Button'; // For logout button styling
 
 function AppNavbar() { // Renamed component slightly to avoid conflict if Navbar name used elsewhere
     const auth = useAuth();
+
+    // --- DEBUGGING LINE ADDED ---
+    // Log the user object provided by the AuthContext to check its structure and role property
+    console.log('Navbar User Object:', auth.user);
+    // --- END DEBUGGING LINE ---
 
     return (
         // Use Navbar component from react-bootstrap
@@ -38,13 +42,14 @@ function AppNavbar() { // Renamed component slightly to avoid conflict if Navbar
                         {auth.isLoggedIn && (
                             <>
                                 <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
-                                {/* *** UNCOMMENTED Profile Link *** */}
                                 <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
                                 <Nav.Link as={Link} to="/suggest-category">Suggest Category</Nav.Link>
 
+                                {/* Check if user exists and role is Business or Admin */}
                                 {(auth.user?.role === 'Business' || auth.user?.role === 'Admin') && (
                                     <Nav.Link as={Link} to="/create-competition">Create Competition</Nav.Link>
                                 )}
+                                {/* Check if user exists and role is Admin */}
                                 {auth.user?.role === 'Admin' && (
                                     <Nav.Link as={Link} to="/admin" style={{ fontWeight: 'bold', color: 'red' }}>Admin Panel</Nav.Link>
                                 )}

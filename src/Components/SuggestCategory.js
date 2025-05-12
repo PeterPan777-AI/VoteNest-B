@@ -1,12 +1,10 @@
-// src/Components/SuggestCategory.js
+// Filename: frontend/src/Components/SuggestCategory.js
 
-import React, { useState } from 'react'; // Removed useContext
-// CORRECTED: Import useAuth hook
-import { useAuth } from '../Context/AuthContext';
-// import './SuggestCategory.css'; // Optional styling
+import React, { useState } from 'react';
+import { useAuth } from '../Context/AuthContext'; // Your AuthContext hook
+// import './SuggestCategory.css'; // Optional styling if you have this file
 
 const SuggestCategory = () => {
-  // CORRECTED: Use useAuth hook
   const { token, user, isLoggedIn, isLoading: authLoading } = useAuth();
   const [categoryName, setCategoryName] = useState('');
   const [reason, setReason] = useState('');
@@ -14,69 +12,128 @@ const SuggestCategory = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
     setSuccessMessage('');
 
     if (!isLoggedIn || !user || !token) {
-       setError('Must be logged in.');
-       return;
+      setError('You must be logged in to suggest a category.');
+      return;
     }
     if (!categoryName.trim()) {
-      setError('Category name required.');
+      setError('Category name is required.');
       return;
     }
 
-    const suggestionData = {
-      suggestedCategory: categoryName, reason,
-      submittedByUserId: user.id, submittedByUsername: user.username, // Adjust if user obj structure differs
-    };
-    console.log('SuggestCategory: Submitting data:', suggestionData);
-
-    // --- Simulate API Call ---
     setIsSubmitting(true);
-    console.log('SuggestCategory: Simulating API POST...');
-    console.log(`SuggestCategory: Using Token: ${token.substring(0, 15)}...`);
 
-    setTimeout(() => {
-      try {
-        console.log(`SuggestCategory: Simulated Success!`);
-        setSuccessMessage(`Thanks, ${user.username || 'user'}! Suggestion "${categoryName}" submitted.`);
-        setCategoryName('');
-        setReason('');
-      } catch (simulatedError) {
-        console.error('SuggestCategory: Simulated API Error:', simulatedError);
-        setError('Failed to submit suggestion.');
-      } finally {
-        setIsSubmitting(false);
+    // This is the data structure your backend expects
+    const suggestionData = {
+      categoryName: categoryName.trim(),
+      reason: reason.trim(),
+    };
+
+    try {
+      const response = await fetch('/api/category-suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Send the token for authentication
+        },
+        body: JSON.stringify(suggestionData),
+      });
+
+      const responseData = await response.json(); // Always try to parse JSON
+
+      if (!response.ok) {
+        // If response is not OK (e.g., 400, 401, 500), throw an error to be caught by the catch block
+        // Use the message from the backend if available, otherwise a generic one
+        throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
       }
-    }, 1000);
+
+      // If the submission was successful (e.g., status 201)
+      setSuccessMessage(responseData.message || `Suggestion "${categoryName}" submitted successfully! Awaiting review.`);
+      setCategoryName(''); // Clear the form
+      setReason('');       // Clear the form
+
+    } catch (err) {
+      console.error('SuggestCategory: API Error:', err);
+      // Display the error message from the error object (thrown manually or network error)
+      setError(err.message || 'Failed to submit suggestion. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // --- Render Logic ---
-  if (authLoading) return <div>Loading...</div>;
-  if (!isLoggedIn) return <div>Please log in to suggest a category.</div>;
+  if (authLoading) return <div style={{ padding: '20px', textAlign: 'center' }}>Loading authentication status...</div>;
+  if (!isLoggedIn) return <div style={{ padding: '20px', textAlign: 'center' }}>Please log in to suggest a category.</div>;
 
   return (
-    <div className="suggest-category-container">
-      <h2>Suggest a New Category</h2>
-      <p>Think we're missing something?</p>
+    <div className="suggest-category-container" style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <h2 style={{ textAlign: 'center', color: '#333' }}>Suggest a New Category</h2>
+      <p style={{ textAlign: 'center', color: '#555', marginBottom: '20px' }}>
+        Think we're missing a category for competitions? Let us know!
+      </p>
 
       <form onSubmit={handleSubmit} className={`suggest-category-form ${isSubmitting ? 'submitting' : ''}`}>
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="categoryName">Suggested Category:</label><br />
-          <input type="text" id="categoryName" value={categoryName} onChange={(e) => setCategoryName(e.target.value)} required disabled={isSubmitting} style={{ minWidth: '250px', padding: '8px' }} />
-        </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="reason">Reason (Optional):</label><br />
-          <textarea id="reason" value={reason} onChange={(e) => setReason(e.target.value)} rows="3" disabled={isSubmitting} style={{ width: '80%', minWidth: '250px', padding: '8px' }} placeholder="Why add this?" />
+          <label htmlFor="categoryName" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Suggested Category Name: <span style={{ color: 'red' }}>*</span>
+          </label>
+          <input
+            type="text"
+            id="categoryName"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+            required
+            disabled={isSubmitting}
+            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' }}
+            placeholder="e.g., Sustainable Tech Innovations"
+          />
         </div>
 
-        {error && <p style={{ color: 'red' }} className="error-message">Error: {error}</p>}
-        {successMessage && <p style={{ color: 'green' }} className="success-message">{successMessage}</p>}
+        <div style={{ marginBottom: '20px' }}>
+          <label htmlFor="reason" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Reason for Suggestion (Optional):
+          </label>
+          <textarea
+            id="reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            rows="4"
+            disabled={isSubmitting}
+            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' }}
+            placeholder="Why do you think this category would be a good addition?"
+          />
+        </div>
 
-        <button type="submit" disabled={isSubmitting} style={{ marginTop: '10px', padding: '10px 15px' }} className="submit-button">
+        {error && (
+          <p style={{ color: 'red', backgroundColor: '#ffebee', border: '1px solid red', padding: '10px', borderRadius: '4px', marginBottom: '15px' }} className="error-message">
+            Error: {error}
+          </p>
+        )}
+        {successMessage && (
+          <p style={{ color: 'green', backgroundColor: '#e8f5e9', border: '1px solid green', padding: '10px', borderRadius: '4px', marginBottom: '15px' }} className="success-message">
+            {successMessage}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          style={{
+            backgroundColor: isSubmitting ? '#ccc' : '#007bff',
+            color: 'white',
+            padding: '12px 20px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            width: '100%',
+            fontSize: '16px'
+          }}
+          className="submit-button"
+        >
           {isSubmitting ? 'Submitting...' : 'Submit Suggestion'}
         </button>
       </form>
