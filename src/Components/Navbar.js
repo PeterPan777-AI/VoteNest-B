@@ -1,89 +1,76 @@
-// src/components/Navbar.js
-// --- Full Replacement Code ---
-// --- Added console.log for debugging user object ---
+// --- Full Replacement Code for: Frontend/src/Components/Navbar.js ---
+import React, { useState } from 'react'; // Removed 'useContext' from here as useAuth handles it
+import { Navbar as NavbarRB, Nav, NavDropdown, Container } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../Context/AuthContext'; // Import useAuth instead of AuthContext
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../Context/AuthContext'; // Adjust path if needed
-// Import necessary components from react-bootstrap
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import Button from 'react-bootstrap/Button'; // For logout button styling
+// import './Navbar.css'; // Or your custom CSS path if you have specific Navbar.css
 
-function AppNavbar() { // Renamed component slightly to avoid conflict if Navbar name used elsewhere
-    const auth = useAuth();
+const Navbar = () => {
+    const { user, logout, isLoggedIn } = useAuth(); // Use the useAuth hook
+    const navigate = useNavigate();
+    const [expanded, setExpanded] = useState(false); // State for navbar collapse
 
-    // --- DEBUGGING LINE ADDED ---
-    // Log the user object provided by the AuthContext to check its structure and role property
-    console.log('Navbar User Object:', auth.user);
-    // --- END DEBUGGING LINE ---
+    // console.log("Navbar User Object:", user); // For debugging
+    // console.log("Navbar isLoggedIn:", isLoggedIn); // For debugging
+
+    const handleLogout = () => {
+        logout();
+        setExpanded(false); // Close navbar on logout
+        navigate('/login');
+    };
+
+    // Function to close the navbar, can be used by any link
+    const closeNavbar = () => setExpanded(false);
 
     return (
-        // Use Navbar component from react-bootstrap
-        // expand="lg" means it will collapse on screens smaller than 'large'
-        // bg="light" sets background color, variant="light" adjusts text/toggle colors
-        <Navbar bg="light" variant="light" expand="lg" sticky="top" className="mb-4 shadow-sm">
-            <Container> {/* Wraps content for proper alignment and padding */}
-                {/* Optional: Add a Brand/Logo - Link to homepage */}
-                <Navbar.Brand as={Link} to="/">VoteNest</Navbar.Brand>
-
-                {/* Hamburger button for mobile */}
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
-                {/* Collapsible content */}
-                <Navbar.Collapse id="basic-navbar-nav">
-                    {/* Left-aligned navigation links */}
-                    <Nav className="me-auto"> {/* me-auto pushes subsequent items to the right */}
-                        <Nav.Link as={Link} to="/competitions">Competitions</Nav.Link>
-                        <Nav.Link as={Link} to="/leaderboard">Leaderboard</Nav.Link>
-
-                        {/* Links shown only when logged in */}
-                        {auth.isLoggedIn && (
-                            <>
-                                <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
-                                <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
-                                <Nav.Link as={Link} to="/suggest-category">Suggest Category</Nav.Link>
-
-                                {/* Check if user exists and role is Business or Admin */}
-                                {(auth.user?.role === 'Business' || auth.user?.role === 'Admin') && (
-                                    <Nav.Link as={Link} to="/create-competition">Create Competition</Nav.Link>
-                                )}
-                                {/* Check if user exists and role is Admin */}
-                                {auth.user?.role === 'Admin' && (
-                                    <Nav.Link as={Link} to="/admin" style={{ fontWeight: 'bold', color: 'red' }}>Admin Panel</Nav.Link>
-                                )}
-                            </>
-                        )}
+        <NavbarRB 
+            variant="dark" 
+            expand="lg" 
+            className="navbar" 
+            expanded={expanded} // Control expanded state
+            onToggle={() => setExpanded(prevExpanded => !prevExpanded)} // Handle toggle button click
+        >
+            <Container fluid>
+                <NavbarRB.Brand as={Link} to="/" className="navbar-brand-custom" onClick={closeNavbar}>VoteNest</NavbarRB.Brand>
+                <NavbarRB.Toggle aria-controls="basic-navbar-nav" />
+                <NavbarRB.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        <Nav.Link as={Link} to="/competitions" className="navbar-link" onClick={closeNavbar}>Competitions</Nav.Link>
+                        <Nav.Link as={Link} to="/leaderboard" className="navbar-link" onClick={closeNavbar}>Leaderboard</Nav.Link>
+                        {/* Ensure user object is checked before trying to access its properties like 'role' */}
+                        {isLoggedIn && user && <Nav.Link as={Link} to="/suggest-category" className="navbar-link" onClick={closeNavbar}>Suggest Category</Nav.Link>}
                     </Nav>
-
-                    {/* Right-aligned navigation items */}
                     <Nav>
-                        {auth.isLoggedIn ? (
+                        {isLoggedIn && user ? ( // Check isLoggedIn and user
                             <>
-                                <Navbar.Text className="me-3"> {/* Use Navbar.Text for non-link text */}
-                                    Signed in as: <Link to="/profile">{auth.user?.username || 'User'}</Link> ({auth.user?.role})
-                                    {/* Added role display here as well for clarity */}
-                                </Navbar.Text>
-                                <Button variant="outline-secondary" size="sm" onClick={auth.logout}>Logout</Button>
+                                <NavDropdown 
+                                    title={user.username || 'User'} 
+                                    id="basic-nav-dropdown" 
+                                    align="end" 
+                                    className="navbar-link"
+                                >
+                                    <NavDropdown.Item as={Link} to="/profile" className="navbar-link-dropdown" onClick={closeNavbar}>Profile</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/dashboard" className="navbar-link-dropdown" onClick={closeNavbar}>Dashboard</NavDropdown.Item>
+                                    {user.role === 'Admin' && <NavDropdown.Item as={Link} to="/admin" className="navbar-link-dropdown" onClick={closeNavbar}>Admin Panel</NavDropdown.Item>}
+                                    { (user.role === 'Business' || user.role === 'Admin') && 
+                                        <NavDropdown.Item as={Link} to="/create-competition" className="navbar-link-dropdown" onClick={closeNavbar}>Create Competition</NavDropdown.Item>
+                                    }
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={handleLogout} className="navbar-link-dropdown">Logout</NavDropdown.Item> 
+                                </NavDropdown>
                             </>
                         ) : (
                             <>
-                                {/* Display Loading state if needed */}
-                                { auth.isLoading && <Navbar.Text className="me-3">Loading...</Navbar.Text> }
-                                { !auth.isLoading &&
-                                    <>
-                                        <Nav.Link as={Link} to="/login">Login</Nav.Link>
-                                        <Nav.Link as={Link} to="/register">Register</Nav.Link>
-                                    </>
-                                }
+                                <Nav.Link as={Link} to="/login" className="navbar-link" onClick={closeNavbar}>Login</Nav.Link>
+                                <Nav.Link as={Link} to="/register" className="navbar-link" onClick={closeNavbar}>Register</Nav.Link>
                             </>
                         )}
                     </Nav>
-                </Navbar.Collapse>
+                </NavbarRB.Collapse>
             </Container>
-        </Navbar>
+        </NavbarRB>
     );
-}
+};
 
-export default AppNavbar;
+export default Navbar;

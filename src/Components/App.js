@@ -1,4 +1,4 @@
-// --- Full Replacement Code for: Frontend/src/Components/App.js ---
+// --- Full Replacement Code for: Frontend/src/App.js ---
 // Paths adjusted based on App.js being in Frontend/src/Components/
 
 import React from 'react';
@@ -14,7 +14,7 @@ import '../App.css';
 import '../Assets/Styles/index.css'; 
 
 // --- Core Components (Assuming these are in the SAME Frontend/src/Components/ folder as App.js) ---
-import AppNavbar from './Navbar';
+import Navbar from './Navbar'; // Correctly importing Navbar
 import Login from './Login';
 import Register from './Register';
 import Dashboard from './Dashboard';
@@ -51,7 +51,7 @@ function App() {
   return (
       <AuthProvider>
           <div className="App">
-            <AppNavbar />
+            <Navbar /> {/* <<< --- CORRECTED THIS LINE --- >>> */}
             <main className="main-content" style={{ maxWidth: '1200px', margin: '20px auto', padding: '0 15px' }}>
               <Routes>
                 {/* All your page routes go here... */}

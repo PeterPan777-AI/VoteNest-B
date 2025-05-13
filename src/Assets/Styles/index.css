@@ -16,13 +16,20 @@
    ========================================================================== */
 
 :root {
-  --color-primary: #007bff;
-  --color-secondary: #6c757d;
-  --color-text: #212529;
-  --color-background: #ffffff;
+  --color-primary: #007bff;     /* Your original primary blue */
+  --color-secondary: #6c757d;   /* Your original secondary gray */
+  
+  /* For dark theme, Bootstrap will manage main text and background.
+     These can be used for custom components if needed, or adjusted/removed. */
+  --color-text-custom: #212529;       /* Original text color (for light mode if you had a toggle) */
+  --color-background-custom: #ffffff; /* Original background color (for light mode if you had a toggle) */
+
   --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  --font-size-base: 1rem;
-  --line-height-base: 1.6;
+  
+  /* We will set the actual font size in the body tag directly for now */
+  /* --font-size-base: 1rem; */ /* Original base font size variable */
+  
+  --line-height-base: 1.6;      /* Original line height */
   --spacing-md: 1rem;
   --border-radius: 0.25rem;
 }
@@ -38,12 +45,33 @@ html {
 
 body {
   font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-base);
-  color: var(--color-text);
-  background-color: var(--color-background);
+  
+  /* MODIFIED: Set a smaller base font size */
+  font-size: 0.8rem; /* Approximately 20% smaller than 1rem. Adjust 0.8rem as needed. */
+  
+  /* MODIFIED: Adjusted line height for potentially smaller font */
+  line-height: 1.5; 
+  
+  /* Bootstrap dark theme (data-bs-theme="dark" on <html>) will set the
+     body text color and background color. 
+     Your custom --color-text and --color-background might conflict or be
+     unnecessary for the global body if Bootstrap handles them.
+     We'll let Bootstrap handle it for now. If you have custom non-Bootstrap
+     components that rely on these, we might need to re-evaluate. */
+  /* color: var(--color-text-custom); */
+  /* background-color: var(--color-background-custom); */
+  
   min-height: 100vh;
+  /* Ensure body takes up full viewport height if needed for background color */
+  display: flex;
+  flex-direction: column;
 }
+
+/* Make sure the main content area can grow */
+.App > .main-content { /* Assuming your main content has a class like 'main-content' and is a direct child of 'App' div */
+  flex-grow: 1;
+}
+
 
 /* ==========================================================================
    4. Basic Element Styling - Add more as needed
@@ -52,19 +80,23 @@ body {
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: var(--spacing-md);
   font-weight: 600;
+  /* Text color for headings will be inherited or set by Bootstrap's dark theme */
 }
 
 p {
   margin-bottom: var(--spacing-md);
+  /* Text color for paragraphs will be inherited or set by Bootstrap's dark theme */
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-primary); /* Your primary blue - check how this looks on dark theme */
   text-decoration: none;
 }
 
 a:hover {
   text-decoration: underline;
+  /* Consider a slightly lighter shade of primary for hover on dark theme if needed */
+  /* filter: brightness(1.2); */ 
 }
 
 img {
@@ -74,17 +106,21 @@ img {
 }
 
 button {
+  /* Bootstrap buttons will largely be styled by Bootstrap.
+     If you have custom non-Bootstrap buttons, they might need specific dark theme styling. */
   cursor: pointer;
   padding: 0.5rem 1rem;
   border: 1px solid transparent;
   border-radius: var(--border-radius);
-  background-color: var(--color-primary);
-  color: white;
+  /* Default button styling might be overridden by Bootstrap if Bootstrap classes are used.
+     If not using Bootstrap button classes, this needs dark theme consideration. */
+  /* background-color: var(--color-primary); */ /* This would make buttons blue */
+  /* color: white; */
 }
 
-button:hover {
+/* button:hover {
   opacity: 0.9;
-}
+} */
 
 /* Example utility class */
 .container {
@@ -93,37 +129,38 @@ button:hover {
   margin: 0 auto;
   padding: 0 1rem;
 }
-/* --- CSS Styles to ADD to the END of: Frontend/src/Assets/Styles/index.css --- */
 
 /* ==========================================================================
-   Go To Top Button Styles
+   Go To Top Button Styles (This was added in our previous steps)
    ========================================================================== */
 
-   .go-to-top-button {
-    position: fixed; /* This keeps the button in place even when you scroll */
-    bottom: 20px;    /* How far from the bottom of the screen */
-    right: 20px;     /* How far from the right of the screen */
-    z-index: 1000;   /* This makes sure it's on top of other things on the page */
+.go-to-top-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+
+  /* Let's use Bootstrap's theme colors if available, or fall back */
+  /* For dark theme, --bs-secondary-bg or a dark gray */
+  background-color: var(--bs-secondary-bg, #343a40); /* Example dark color */
+  color: var(--bs-light, #f8f9fa); /* Example light text color */
   
-    background-color: #6c757d; /* A nice gray color for the background (you can change this later) */
-    color: white;              /* The arrow color */
-    border: none;              /* No ugly border */
-    border-radius: 50%;        /* This makes it a circle */
-    width: 40px;               /* Width of the button */
-    height: 40px;              /* Height of the button */
-    font-size: 1.2rem;         /* Size of the arrow inside */
-    line-height: 40px;         /* Helps center the arrow vertically */
-    text-align: center;        /* Helps center the arrow horizontally */
-    
-    cursor: pointer;           /* Shows a hand cursor when you hover over it */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* A little shadow to make it pop */
-    
-    /* These make changes look smooth */
-    transition: background-color 0.3s ease, opacity 0.3s ease; 
-    opacity: 0.8; /* Slightly see-through when not hovered */
-  }
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  line-height: 40px;
+  text-align: center;
   
-  .go-to-top-button:hover {
-    background-color: #007bff; /* A blue color when you hover over it (you can change this) */
-    opacity: 1; /* Fully solid when hovered */
-  }
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  opacity: 0.8;
+}
+
+.go-to-top-button:hover {
+  /* For dark theme, --bs-primary-bg or a slightly lighter/brighter dark color */
+  background-color: var(--bs-primary, #007bff); /* Example primary color, check appearance */
+  opacity: 1;
+}

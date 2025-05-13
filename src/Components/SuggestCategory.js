@@ -1,7 +1,9 @@
-// Filename: frontend/src/Components/SuggestCategory.js
+// --- Full Replacement Code for: frontend/src/Components/SuggestCategory.js ---
 
 import React, { useState } from 'react';
-import { useAuth } from '../Context/AuthContext'; // Your AuthContext hook
+import { useAuth } from '../Context/AuthContext';
+import { Alert } from 'react-bootstrap'; // Import Alert component
+
 // import './SuggestCategory.css'; // Optional styling if you have this file
 
 const SuggestCategory = () => {
@@ -28,7 +30,6 @@ const SuggestCategory = () => {
 
     setIsSubmitting(true);
 
-    // This is the data structure your backend expects
     const suggestionData = {
       categoryName: categoryName.trim(),
       reason: reason.trim(),
@@ -39,27 +40,23 @@ const SuggestCategory = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Send the token for authentication
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(suggestionData),
       });
 
-      const responseData = await response.json(); // Always try to parse JSON
+      const responseData = await response.json();
 
       if (!response.ok) {
-        // If response is not OK (e.g., 400, 401, 500), throw an error to be caught by the catch block
-        // Use the message from the backend if available, otherwise a generic one
         throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
       }
 
-      // If the submission was successful (e.g., status 201)
       setSuccessMessage(responseData.message || `Suggestion "${categoryName}" submitted successfully! Awaiting review.`);
-      setCategoryName(''); // Clear the form
-      setReason('');       // Clear the form
+      setCategoryName('');
+      setReason('');
 
     } catch (err) {
       console.error('SuggestCategory: API Error:', err);
-      // Display the error message from the error object (thrown manually or network error)
       setError(err.message || 'Failed to submit suggestion. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -67,72 +64,76 @@ const SuggestCategory = () => {
   };
 
   if (authLoading) return <div style={{ padding: '20px', textAlign: 'center' }}>Loading authentication status...</div>;
+  // This check is good, but for users who are not logged in, you might redirect them or show a more prominent login prompt.
+  // For now, the simple message is fine.
   if (!isLoggedIn) return <div style={{ padding: '20px', textAlign: 'center' }}>Please log in to suggest a category.</div>;
 
   return (
-    <div className="suggest-category-container" style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-      <h2 style={{ textAlign: 'center', color: '#333' }}>Suggest a New Category</h2>
-      <p style={{ textAlign: 'center', color: '#555', marginBottom: '20px' }}>
+    // MODIFIED: Removed inline border and boxShadow. Kept layout styles.
+    // Consider using Bootstrap card classes here if you want a card-like appearance: e.g., className="card p-4"
+    <div 
+      className="suggest-category-container" 
+      style={{ maxWidth: '600px', margin: '20px auto', padding: '20px' }}
+    >
+      {/* MODIFIED: Removed inline color. Text color will now be inherited from the dark theme. */}
+      <h2 style={{ textAlign: 'center', marginBottom: '0.5rem' }}>Suggest a New Category</h2>
+      {/* MODIFIED: Removed inline color. Text color will now be inherited. */}
+      <p style={{ textAlign: 'center', marginBottom: '20px' }}>
         Think we're missing a category for competitions? Let us know!
       </p>
 
       <form onSubmit={handleSubmit} className={`suggest-category-form ${isSubmitting ? 'submitting' : ''}`}>
-        <div style={{ marginBottom: '15px' }}>
+        <div className="mb-3"> {/* Used Bootstrap margin bottom class */}
           <label htmlFor="categoryName" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
             Suggested Category Name: <span style={{ color: 'red' }}>*</span>
           </label>
           <input
             type="text"
             id="categoryName"
+            className="form-control" // ADDED: Bootstrap class for styling
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
             required
             disabled={isSubmitting}
-            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' }}
+            // REMOVED: Inline styles for width, padding, border, borderRadius, boxSizing (handled by form-control)
             placeholder="e.g., Sustainable Tech Innovations"
           />
         </div>
 
-        <div style={{ marginBottom: '20px' }}>
+        <div className="mb-3"> {/* Used Bootstrap margin bottom class */}
           <label htmlFor="reason" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
             Reason for Suggestion (Optional):
           </label>
           <textarea
             id="reason"
+            className="form-control" // ADDED: Bootstrap class for styling
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows="4"
             disabled={isSubmitting}
-            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' }}
+            // REMOVED: Inline styles for width, padding, border, borderRadius, boxSizing (handled by form-control)
             placeholder="Why do you think this category would be a good addition?"
           />
         </div>
 
+        {/* MODIFIED: Replaced p tag with Bootstrap Alert component for errors */}
         {error && (
-          <p style={{ color: 'red', backgroundColor: '#ffebee', border: '1px solid red', padding: '10px', borderRadius: '4px', marginBottom: '15px' }} className="error-message">
-            Error: {error}
-          </p>
+          <Alert variant="danger" className="mt-3"> 
+            {error}
+          </Alert>
         )}
+        {/* MODIFIED: Replaced p tag with Bootstrap Alert component for success messages */}
         {successMessage && (
-          <p style={{ color: 'green', backgroundColor: '#e8f5e9', border: '1px solid green', padding: '10px', borderRadius: '4px', marginBottom: '15px' }} className="success-message">
+          <Alert variant="success" className="mt-3">
             {successMessage}
-          </p>
+          </Alert>
         )}
 
         <button
           type="submit"
           disabled={isSubmitting}
-          style={{
-            backgroundColor: isSubmitting ? '#ccc' : '#007bff',
-            color: 'white',
-            padding: '12px 20px',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: isSubmitting ? 'not-allowed' : 'pointer',
-            width: '100%',
-            fontSize: '16px'
-          }}
-          className="submit-button"
+          // ADDED: Bootstrap button classes. REMOVED all inline styles.
+          className="btn btn-primary w-100 mt-3" 
         >
           {isSubmitting ? 'Submitting...' : 'Submit Suggestion'}
         </button>
