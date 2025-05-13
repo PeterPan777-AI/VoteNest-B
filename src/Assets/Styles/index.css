@@ -93,3 +93,37 @@ button:hover {
   margin: 0 auto;
   padding: 0 1rem;
 }
+/* --- CSS Styles to ADD to the END of: Frontend/src/Assets/Styles/index.css --- */
+
+/* ==========================================================================
+   Go To Top Button Styles
+   ========================================================================== */
+
+   .go-to-top-button {
+    position: fixed; /* This keeps the button in place even when you scroll */
+    bottom: 20px;    /* How far from the bottom of the screen */
+    right: 20px;     /* How far from the right of the screen */
+    z-index: 1000;   /* This makes sure it's on top of other things on the page */
+  
+    background-color: #6c757d; /* A nice gray color for the background (you can change this later) */
+    color: white;              /* The arrow color */
+    border: none;              /* No ugly border */
+    border-radius: 50%;        /* This makes it a circle */
+    width: 40px;               /* Width of the button */
+    height: 40px;              /* Height of the button */
+    font-size: 1.2rem;         /* Size of the arrow inside */
+    line-height: 40px;         /* Helps center the arrow vertically */
+    text-align: center;        /* Helps center the arrow horizontally */
+    
+    cursor: pointer;           /* Shows a hand cursor when you hover over it */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* A little shadow to make it pop */
+    
+    /* These make changes look smooth */
+    transition: background-color 0.3s ease, opacity 0.3s ease; 
+    opacity: 0.8; /* Slightly see-through when not hovered */
+  }
+  
+  .go-to-top-button:hover {
+    background-color: #007bff; /* A blue color when you hover over it (you can change this) */
+    opacity: 1; /* Fully solid when hovered */
+  }
