@@ -12,23 +12,22 @@
 }
 
 /* ==========================================================================
-   2. CSS Custom Properties (Variables) - Optional but recommended
+   2. CSS Custom Properties (Variables)
    ========================================================================== */
 
 :root {
-  --color-primary: #007bff;     /* Your original primary blue */
-  --color-secondary: #6c757d;   /* Your original secondary gray */
-  
+  --color-primary: #007bff;     /* Your original primary blue. Bootstrap components (btn-primary, etc.) will use their own primary unless you've customized Bootstrap's Sass variables. */
+  --color-secondary: #6c757d;   /* Your original secondary gray. */
+
   /* For dark theme, Bootstrap will manage main text and background.
      These can be used for custom components if needed, or adjusted/removed. */
   --color-text-custom: #212529;       /* Original text color (for light mode if you had a toggle) */
   --color-background-custom: #ffffff; /* Original background color (for light mode if you had a toggle) */
 
   --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  
-  /* We will set the actual font size in the body tag directly for now */
-  /* --font-size-base: 1rem; */ /* Original base font size variable */
-  
+
+  /* --font-size-base: 1rem; */ /* Base font size is set in body */
+
   --line-height-base: 1.6;      /* Original line height */
   --spacing-md: 1rem;
   --border-radius: 0.25rem;
@@ -45,58 +44,50 @@ html {
 
 body {
   font-family: var(--font-family-base);
-  
-  /* MODIFIED: Set a smaller base font size */
-  font-size: 0.8rem; /* Approximately 20% smaller than 1rem. Adjust 0.8rem as needed. */
-  
-  /* MODIFIED: Adjusted line height for potentially smaller font */
-  line-height: 1.5; 
-  
-  /* Bootstrap dark theme (data-bs-theme="dark" on <html>) will set the
-     body text color and background color. 
-     Your custom --color-text and --color-background might conflict or be
-     unnecessary for the global body if Bootstrap handles them.
-     We'll let Bootstrap handle it for now. If you have custom non-Bootstrap
-     components that rely on these, we might need to re-evaluate. */
-  /* color: var(--color-text-custom); */
-  /* background-color: var(--color-background-custom); */
-  
+  font-size: 0.8rem; /* Global font size */
+  line-height: 1.5; /* Adjusted line height for smaller font */
+
+  /* Bootstrap (data-bs-theme="dark" on <html>) sets body text and background colors.
+     If Bootstrap is imported and data-bs-theme is active,
+     these will be:
+     color: var(--bs-body-color);
+     background-color: var(--bs-body-bg);
+  */
+
   min-height: 100vh;
-  /* Ensure body takes up full viewport height if needed for background color */
   display: flex;
   flex-direction: column;
 }
 
 /* Make sure the main content area can grow */
-.App > .main-content { /* Assuming your main content has a class like 'main-content' and is a direct child of 'App' div */
+.App > .main-content {
   flex-grow: 1;
 }
 
 
 /* ==========================================================================
-   4. Basic Element Styling - Add more as needed
+   4. Basic Element Styling
    ========================================================================== */
 
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: var(--spacing-md);
   font-weight: 600;
-  /* Text color for headings will be inherited or set by Bootstrap's dark theme */
+  /* Text color for headings will be inherited from Bootstrap's theme-aware --bs-heading-color or --bs-body-color */
 }
 
 p {
   margin-bottom: var(--spacing-md);
-  /* Text color for paragraphs will be inherited or set by Bootstrap's dark theme */
+  /* Text color for paragraphs will be inherited from Bootstrap's --bs-body-color */
 }
 
 a {
-  color: var(--color-primary); /* Your primary blue - check how this looks on dark theme */
-  text-decoration: none;
+  color: var(--bs-link-color); /* MODIFIED: Use Bootstrap's theme-aware link color */
+  text-decoration: none; /* Default is often 'underline', explicitly set to 'none' if preferred globally */
 }
 
 a:hover {
+  color: var(--bs-link-hover-color); /* MODIFIED: Use Bootstrap's theme-aware link hover color */
   text-decoration: underline;
-  /* Consider a slightly lighter shade of primary for hover on dark theme if needed */
-  /* filter: brightness(1.2); */ 
 }
 
 img {
@@ -106,21 +97,13 @@ img {
 }
 
 button {
-  /* Bootstrap buttons will largely be styled by Bootstrap.
+  /* Bootstrap button classes (.btn, .btn-primary, etc.) will largely style buttons.
      If you have custom non-Bootstrap buttons, they might need specific dark theme styling. */
   cursor: pointer;
   padding: 0.5rem 1rem;
   border: 1px solid transparent;
   border-radius: var(--border-radius);
-  /* Default button styling might be overridden by Bootstrap if Bootstrap classes are used.
-     If not using Bootstrap button classes, this needs dark theme consideration. */
-  /* background-color: var(--color-primary); */ /* This would make buttons blue */
-  /* color: white; */
 }
-
-/* button:hover {
-  opacity: 0.9;
-} */
 
 /* Example utility class */
 .container {
@@ -131,7 +114,7 @@ button {
 }
 
 /* ==========================================================================
-   Go To Top Button Styles (This was added in our previous steps)
+   Go To Top Button Styles
    ========================================================================== */
 
 .go-to-top-button {
@@ -140,19 +123,18 @@ button {
   right: 20px;
   z-index: 1000;
 
-  /* Let's use Bootstrap's theme colors if available, or fall back */
-  /* For dark theme, --bs-secondary-bg or a dark gray */
-  background-color: var(--bs-secondary-bg, #343a40); /* Example dark color */
-  color: var(--bs-light, #f8f9fa); /* Example light text color */
-  
+  /* Uses Bootstrap variables which adapt to the theme */
+  background-color: var(--bs-secondary-bg); /* Will be dark in dark mode */
+  color: var(--bs-light); /* Will be light text in dark mode */
+
   border: none;
   border-radius: 50%;
   width: 40px;
   height: 40px;
   font-size: 1.2rem;
-  line-height: 40px;
+  line-height: 40px; /* Ensure icon is centered */
   text-align: center;
-  
+
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   transition: background-color 0.3s ease, opacity 0.3s ease;
@@ -160,7 +142,11 @@ button {
 }
 
 .go-to-top-button:hover {
-  /* For dark theme, --bs-primary-bg or a slightly lighter/brighter dark color */
-  background-color: var(--bs-primary, #007bff); /* Example primary color, check appearance */
+  /* Check appearance of --bs-primary on dark backgrounds.
+     If var(--bs-primary) (default #007bff) doesn't have enough contrast on dark hover,
+     consider using a lighter blue for dark mode hover, or a different Bootstrap variable.
+     For example: var(--bs-primary-bg-subtle) for a subtle dark blue,
+     or define a custom dark theme hover color. */
+  background-color: var(--bs-primary);
   opacity: 1;
 }

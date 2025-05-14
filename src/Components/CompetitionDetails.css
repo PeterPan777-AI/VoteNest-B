@@ -1,20 +1,19 @@
 /* src/Components/CompetitionDetails.css */
-/* --- Updated File Content --- */
 
 /* Styles from initial details page */
 .details-container {
   max-width: 900px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px auto; /* Keep if you prefer this over Card's my-3 */
+  /* padding: 20px; */ /* Card.Body will provide padding, adjust if this was critical */
+  /* background-color: #fff; */ /* REMOVE - Card will handle this */
+  /* border-radius: 8px; */    /* REMOVE - Card handles this */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */ /* REMOVE - Card handles this */
 }
 
-.back-link {
+.back-link { /* Keep this if you're not using a Bootstrap Button component for it */
   display: inline-block;
-  margin-bottom: 20px;
-  color: #007bff;
+  /* margin-bottom: 20px; */ /* Replaced with mb-3 on Button */
+  /* color: #007bff; */ /* Let Bootstrap link/button variant handle color */
   text-decoration: none;
   font-weight: 500;
 }
@@ -23,77 +22,53 @@
   text-decoration: underline;
 }
 
-.details-not-found {
-  color: #dc3545;
-  font-weight: bold;
+.details-not-found { /* This will be handled by Alert component */
+  /* color: #dc3545; */
+  /* font-weight: bold; */
 }
 
 .details-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Allow wrapping on small screens */
-  gap: 10px; /* Space between title and button/text */
-  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* border-bottom: 1px solid #eee; */ /* REMOVE - or use var(--bs-border-color) if border still needed */
+  border-bottom: 1px solid var(--bs-border-color); /* If you still want a border here */
   padding-bottom: 15px;
   margin-bottom: 20px;
 }
 
 .details-title {
   margin: 0;
-  color: #333;
+  /* color: #333; */ /* REMOVE - Will inherit or use --bs-body-color */
+  color: var(--bs-body-color); /* Explicitly use Bootstrap's theme-aware text color */
   font-size: 1.8em;
 }
 
+.details-type { /* Added text-muted in JS, can remove specific color here */
+  /* color: #6c757d; */ /* This is Bootstrap's secondary, text-muted will apply this */
+}
+
 .details-actions {
-    display: flex; /* Align items in the actions container */
+    display: flex;
     align-items: center;
-    gap: 10px; /* Use gap for spacing between buttons */
+    gap: 10px;
 }
 
-.details-submit-button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  text-decoration: none;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.details-submit-button:hover {
-  background-color: #0056b3;
-}
-
-/* Edit button styling (assuming similar base style or link) */
-.details-edit-button {
-  background-color: #ffc107; /* Example: Yellow/Amber color */
-  color: #212529; /* Dark text for contrast */
-  padding: 8px 15px; /* Adjust padding if needed */
-  border: none;
-  border-radius: 4px;
-  text-decoration: none; /* Remove underline if it's a link */
-  font-size: 0.9em; /* Match delete button? */
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  display: inline-block; /* Ensure it behaves like a button */
-}
-
-.details-edit-button:hover {
-  background-color: #e0a800; /* Darker yellow */
-}
-
+/* --- REMOVE ALL CUSTOM BUTTON STYLES if using React Bootstrap Buttons --- */
+/* .details-submit-button { ... } */
+/* .details-edit-button { ... } */
+/* .details-delete-button { ... } */
 
 .details-cannot-submit-info {
-  color: #6c757d; /* Gray text */
+  /* color: #6c757d; */ /* text-muted in JS will handle this */
   font-size: 0.9em;
-  margin: 0; /* Remove default paragraph margin */
+  margin: 0;
 }
 
-.details-cannot-submit-info a {
-    color: #007bff;
+.details-cannot-submit-info a { /* Link color will be handled by Bootstrap */
+    /* color: #007bff; */
     text-decoration: underline;
 }
 
@@ -108,12 +83,14 @@
 .details-section strong {
   display: block;
   margin-bottom: 5px;
-  color: #555;
+  /* color: #555; */ /* REMOVE - Will inherit or use --bs-body-color */
+  color: var(--bs-body-color);
 }
 
 .details-section p {
   margin: 0;
-  color: #333;
+  /* color: #333; */ /* REMOVE - Will inherit or use --bs-body-color */
+  color: var(--bs-body-color);
   line-height: 1.6;
 }
 
@@ -121,222 +98,150 @@
 .details-submissions-section {
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  /* border-top: 1px solid #eee; */ /* REMOVE or use --bs-border-color */
+  border-top: 1px solid var(--bs-border-color);
 }
 
 .details-submissions-section h2 {
   margin-bottom: 15px;
-  color: #333;
+  /* color: #333; */ /* REMOVE - Will inherit or use --bs-body-color */
+  color: var(--bs-body-color);
 }
 
-.submission-list {
+.submission-list { /* Or .submissions-grid if you prefer */
   display: grid;
   gap: 25px;
-  /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */
+  /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */ /* Keep if you like this layout */
 }
 
-.submission-item {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* --- .submission-item is now .submission-card (React Bootstrap Card) --- */
+/* --- Styles for .submission-item can largely be removed --- */
+.submission-card { /* If you still need to target the card, but prefer Bootstrap defaults */
+  /* border: 1px solid #ddd; */ /* REMOVE */
+  /* background-color: #fff; */ /* REMOVE */
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */ /* REMOVE */
+  /* display: flex; */ /* Card handles its own display */
+  /* flex-direction: column; */ /* Card handles its own display */
+  /* gap: 10px; */ /* Card.Body can handle this */
 }
 
-/* Submission Files (added from previous step) */
 .submission-files {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 10px; /* Space between files and content */
+    margin-bottom: 10px;
 }
 
 .submission-file-link {
     display: inline-block;
-    max-width: 100%; /* Prevent links from overflowing */
+    max-width: 100%;
 }
 
-.submission-image-preview {
-  max-width: 150px; /* Control image size */
-  height: auto;
-  max-height: 100px; /* Limit height */
+.submission-image-thumbnail { /* Renamed from submission-image-preview for clarity */
+  max-width: 100px; /* Adjusted for typical thumbnail size */
+  max-height: 100px;
   object-fit: cover;
   border-radius: 4px;
-  background-color: #f0f0f0;
-  border: 1px solid #eee;
-  /* Remove fixed aspect ratio to respect image dimensions better */
+  /* background-color: #f0f0f0; */ /* Let card background handle this */
+  border: 1px solid var(--bs-border-color); /* Use Bootstrap border color */
 }
 
 .submission-content {
   flex-grow: 1;
 }
 
-.submission-title {
+.submission-title { /* Card.Title will handle styling, but you can override */
   margin: 0 0 8px 0;
-  font-size: 1.2em;
-  color: #0056b3;
+  font-size: 1.15em; /* Consistent with .competition-title */
+  /* color: #0056b3; */ /* REMOVE or use var(--bs-link-color) or var(--bs-primary) */
+  color: var(--bs-primary-text-emphasis); /* A good option for titles on cards */
 }
 
-.submission-description {
+.submission-author { /* For Card.Subtitle with text-muted */
+    /* font-size: 0.9em; */
+    /* color: #6c757d; */
+}
+
+.submission-description { /* Card.Text will handle styling */
   margin: 0 0 10px 0;
   font-size: 0.95em;
-  color: #555;
+  /* color: #555; */ /* Will inherit from Card.Text or --bs-body-color */
   line-height: 1.5;
 }
 
 .submission-meta {
   font-size: 0.85em;
-  color: #777;
+  /* color: #777; */ /* Consider using .text-muted or var(--bs-secondary-color) */
+  color: var(--bs-body-secondary-color);
   margin-bottom: 5px;
 }
 
 .submission-meta strong {
-    color: #333;
+    /* color: #333; */ /* Will inherit or use --bs-body-color */
     font-weight: 600;
 }
 
 .submission-votes {
   font-size: 0.9em;
   font-weight: bold;
-  color: #4CAF50;
+  /* color: #4CAF50; */ /* Consider var(--bs-success) or check contrast */
+  color: var(--bs-success-text-emphasis); /* Using success text emphasis */
   margin-top: 10px;
 }
 
 .details-placeholder-text {
-  color: #888;
+  /* color: #888; */ /* text-muted in JS will handle this */
   font-style: italic;
 }
 
-/* --- Vote Button Styling --- */
-.submission-vote-action {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px dashed #eee;
-  text-align: center;
-}
+/* --- REMOVE CUSTOM .vote-button STYLES if using React Bootstrap Buttons --- */
+/* .vote-button { ... } */
+/* .vote-button:hover:not(:disabled) { ... } */
+/* .vote-button:disabled { ... } */
+/* .vote-button.voted { ... } */
+/* .vote-button.voted:hover { ... } */
 
-.vote-button {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.95em;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
-}
+/* If you need a specific style for voted Bootstrap buttons (if not handled by variant change) */
+/* .vote-button.voted-bs { ... } */
 
-.vote-button:hover:not(:disabled) {
-  background-color: #218838;
-}
-
-.vote-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  opacity: 0.7;
+.details-cannot-vote-info { /* If this is an Alert, it will be styled by Bootstrap */
+    /* Styles for this class will be handled by Alert variant="info" */
 }
 
 .vote-login-prompt {
     margin-left: 10px;
     font-size: 0.8em;
-    color: #777;
+    /* color: #777; */ /* text-muted or var(--bs-secondary-color) */
+    color: var(--bs-body-secondary-color);
 }
 
-.vote-button.voted {
-  background-color: #6c757d;
-}
-
-.vote-button.voted:hover {
-    background-color: #5a6268;
-}
-
-.submission-item.voted-permanently {
-  /* Optional styling */
-}
-
-/* --- Media Query Adjustments --- */
+/* --- Media Query Adjustments - Review if still needed with Cards --- */
+/* These might simplify or change based on Card's responsive behavior */
 @media (min-width: 600px) {
-  .submission-item {
-       display: flex;
-       flex-wrap: wrap;
-       align-items: flex-start;
-       gap: 15px; /* Adjust gap */
+  .submission-card { /* Was .submission-item */
+       /* Card already behaves like flex-column, this might not be needed or needs adjustment */
   }
-  .submission-files {
-      flex-basis: 100%; /* Make files container take full width initially */
-      order: 1; /* Show files first */
-  }
-  .submission-image-preview {
-     /* Keep image preview styles from above */
-  }
-   .submission-content {
-       flex-grow: 1;
-       min-width: 200px;
-       order: 2; /* Show content second */
-       margin-bottom: 0;
-   }
-   .submission-vote-action {
-        flex-basis: 100%; /* Vote action takes full width */
-        order: 3; /* Show vote action last */
+  /* .submission-files { ... } */
+  /* .submission-content { ... } */
+  .submission-vote-action { /* This was inside submission-item, now inside Card.Body */
+        flex-basis: 100%; 
+        order: 3; 
         text-align: right;
-        margin-top: 10px; /* Add space above vote action */
+        margin-top: 10px; 
         padding-top: 10px;
-        border-top: 1px dashed #eee; /* Re-add separator */
+        /* border-top: 1px dashed #eee; */ /* REMOVE or use --bs-border-color */
+        border-top: 1px dashed var(--bs-border-color);
    }
-   .vote-login-prompt {
-       display: block;
-       margin-left: 0;
-       margin-top: 5px;
-       text-align: right;
-   }
+   /* .vote-login-prompt { ... } */
 }
 
 /* Placeholder for Voting Section */
 .details-voting-section {
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  /* border-top: 1px solid #eee; */ /* REMOVE or use --bs-border-color */
+  border-top: 1px solid var(--bs-border-color);
 }
 
 /* === Error Message Styling === */
-.error-message {
-  color: #721c24; /* Dark red */
-  background-color: #f8d7da; /* Light red background */
-  border: 1px solid #f5c6cb; /* Red border */
-  padding: 10px 15px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  font-weight: bold;
-}
-
-
-/* === NEW Delete Button Styling (Added) === */
-.details-delete-button {
-  padding: 8px 15px;
-  background-color: #dc3545; /* Red color */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9em; /* Match edit button size? Adjust as needed */
-  transition: background-color 0.2s ease;
-}
-
-.details-delete-button:hover {
-  background-color: #c82333; /* Darker red on hover */
-}
-
-.details-delete-button:disabled {
-  background-color: #f8d7da; /* Lighter red when disabled */
-  color: #721c24;
-  cursor: not-allowed;
-}
-
-/* This rule manages space between buttons in the .details-actions container */
-/* It's already defined above using gap property for flexbox */
-/* .details-actions > * + * { */
-/*     margin-left: 10px; */ /* Can be removed if gap is used consistently */
-/* } */
+/* .error-message { ... } */ /* REMOVE - Replaced by Alert component */
