@@ -1,33 +1,51 @@
 /* Styles for src/Components/Navbar.js */
 
-.navbar {
-    background-color: #333; /* Dark background */
-    padding: 12px 25px; /* Padding top/bottom and left/right */
-    display: flex; /* Use flexbox for horizontal layout */
-    align-items: center; /* Vertically align items in the middle */
-    gap: 20px; /* Space between links */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow below */
-  }
-  
-  .navbar-link {
-    color: white; /* White text color */
-    text-decoration: none; /* Remove underline */
-    font-size: 1rem; /* Standard font size */
-    padding: 5px 0; /* Add some padding for better click area (optional) */
-    border-bottom: 1px solid transparent; /* Prepare for hover effect (NOW 1px) */
-    transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out; /* Smooth transitions */
-  }
-  
-  .navbar-link:hover {
-    color: #ddd; /* Slightly lighter color on hover */
-    border-bottom-color: #ddd; /* Underline effect on hover (will use the 1px thickness) */
-  }
-  
-  /* Optional: Style for the 'active' link if using NavLink later */
-  /*
-  .navbar-link.active {
-    color: #00aaff;
-    border-bottom-color: #00aaff;
-    font-weight: bold;
-  }
-  */
+/* You can still customize the overall background of the NavbarRB component
+   if Bootstrap's bg="dark" variant="dark" isn't exactly what you want,
+   but be cautious with display properties. */
+
+/* NavbarRB itself will be 'navbar navbar-expand-lg navbar-dark bg-dark' by default from props */
+/* So, if you want to target it for specific overrides: */
+.navbar.navbar-custom-override { /* Add navbar-custom-override class to NavbarRB in JS if needed */
+  /* Example: padding: 12px 25px; */
+  /* Example: box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
+  /* AVOID display: flex; here. Let Bootstrap handle it. */
+}
+
+/* Styling for Nav.Link components (your .navbar-link class) */
+/* This targets the <a> tags rendered by Nav.Link */
+.navbar-nav .nav-link.navbar-link-custom, /* For direct Nav.Link */
+.dropdown-menu .dropdown-item.navbar-link-dropdown-custom { /* For NavDropdown.Item */
+  color: white; /* Your desired text color for links in dark theme */
+  /* padding: 5px 0; */ /* Bootstrap might handle padding sufficiently, adjust if needed */
+  /* border-bottom: 1px solid transparent; */ /* This might look odd in collapsed menu */
+  transition: color 0.2s ease-in-out; /* Smooth transitions */
+}
+
+.navbar-nav .nav-link.navbar-link-custom:hover,
+.dropdown-menu .dropdown-item.navbar-link-dropdown-custom:hover {
+  color: #cccccc; /* Lighter color on hover */
+  /* border-bottom-color: #ddd; */ /* Hover underline might not be ideal for all items */
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle hover background for dropdown items */
+}
+
+/* If you need to style the NavDropdown toggle (the part with the username) */
+.navbar-nav .nav-item .dropdown-toggle.navbar-link-custom {
+  color: white !important; /* Override Bootstrap if needed */
+}
+.navbar-nav .nav-item .dropdown-toggle.navbar-link-custom:hover {
+  color: #cccccc !important;
+}
+
+
+/* Customizing the brand */
+.navbar-brand-custom {
+  /* Add custom styles for your brand if needed */
+  /* e.g., font-size: 1.5rem; */
+}
+
+/* WHEN COLLAPSED, Bootstrap adds .navbar-nav to the Nav components.
+ Items inside .navbar-collapse .navbar-nav become block elements and stack.
+ Ensure your .navbar-link styles don't prevent this.
+ The rules above try to be compatible by primarily changing color.
+*/

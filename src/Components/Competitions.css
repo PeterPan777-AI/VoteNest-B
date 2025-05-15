@@ -1,4 +1,4 @@
-/* Example: client/src/Components/Competitions.css */
+/* client/src/Components/Competitions.css */
 
 .filter-controls {
   margin-bottom: 20px;
@@ -24,36 +24,37 @@
 }
 
 .filter-button.active { /* Class for the active button */
-  background-color: #007bff;
+  background-color: #007bff; /* Bootstrap primary blue */
   color: white;
   border-color: #007bff;
   font-weight: bold; /* Optional: make active button text bold */
 }
 
-/* Competition Card Styling (if you want to move existing inline styles) */
+/* Competition Card Styling */
 .competitions-list {
   /* Add any styles for the list container if needed */
 }
 
-.competition-card-item { /* New class for each competition item div */
+.competition-card-item { /* Class for each competition item div */
   border: 1px solid #ccc;
   margin: 10px;
-  padding: 15px; /* Increased padding a bit */
-  border-radius: 8px; /* Slightly more rounded */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Softer shadow */
-  background-color: #fff; /* Ensure card background is white */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background-color: #fff; /* Card background is white */
 }
 
 .competition-card-item h3 {
-  margin-top: 0; /* Adjust heading margin if needed */
+  margin-top: 0;
   margin-bottom: 10px;
-  font-size: 1.5em; /* Slightly larger title */
+  font-size: 1.5em;
+  color: #333333; /* <<<< ***** ADDED THIS LINE ***** Dark text for h3 on white card */
 }
 
 .competition-card-item p {
   margin-bottom: 8px;
   font-size: 0.95em;
-  color: #555; /* Slightly softer text color */
+  color: #555; /* Slightly softer text color for paragraphs on white card */
 }
 .competition-card-item p strong {
   color: #333; /* Make strong text a bit darker */
@@ -62,18 +63,18 @@
 
 /* Badge Styling */
 .competition-badge-container {
-  margin-bottom: 10px; /* Increased space below badge */
-  text-align: right; /* Align badge to the right, or remove for default left */
+  margin-bottom: 10px;
+  text-align: right;
 }
 
 .competition-badge {
-  padding: 5px 12px; /* Slightly larger badge padding */
-  border-radius: 15px; /* More pill-like */
+  padding: 5px 12px;
+  border-radius: 15px;
   font-size: 0.85em;
   font-weight: bold;
-  color: white;
-  text-transform: uppercase; /* Optional: Uppercase badge text */
-  letter-spacing: 0.5px;  /* Optional: slight letter spacing */
+  color: white; /* Badge text is white */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .badge-standard {
@@ -92,7 +93,7 @@
    display: inline-block;
    margin-top: 10px;
    padding: 8px 15px;
-   background-color: #007bff;
+   background-color: #007bff; /* Bootstrap primary blue */
    color: white;
    text-decoration: none;
    border-radius: 4px;
@@ -100,5 +101,5 @@
 }
 
 .competition-card-item a:hover {
-   background-color: #0056b3;
+   background-color: #0056b3; /* Darker blue on hover */
 }

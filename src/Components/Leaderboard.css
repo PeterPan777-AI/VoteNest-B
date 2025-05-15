@@ -1,53 +1,101 @@
 /* Styles for src/Components/Leaderboard.js */
 
 .leaderboard-container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 25px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-  }
-  
-  .leaderboard-header {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #343a40;
-    font-size: 2em;
-  }
-  
-  /* Basic Table Styling Placeholder */
-  .leaderboard-table {
-    width: 100%;
-    border-collapse: collapse; /* Remove space between borders */
-    margin-top: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  
-  .leaderboard-table th,
-  .leaderboard-table td {
-    border: 1px solid #dee2e6;
-    padding: 12px 15px; /* Add good padding */
-    text-align: left;
-  }
-  
-  .leaderboard-table th {
-    background-color: #007bff; /* Header background */
-    color: white;
-    font-weight: bold;
-  }
-  
-  .leaderboard-table tbody tr:nth-child(even) {
-    background-color: #f8f9fa; /* Zebra striping for rows */
-  }
-  
-  .leaderboard-table tbody tr:hover {
-    background-color: #e9ecef; /* Highlight row on hover */
-  }
-  
-  /* Placeholder text if table is empty */
-  .leaderboard-placeholder-text {
-    text-align: center;
-    color: #6c757d;
-    font-style: italic;
-    padding: 40px 0;
-  }
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 25px;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.leaderboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
+}
+
+.leaderboard-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+
+.leaderboard-table {
+  width: 100%; /* Table tries to fill the scroll-wrapper */
+  /* The min-width will be effectively determined by the sum of explicit column widths
+     and max-widths for wrappable columns. Let's remove the explicit min-width here
+     and let the column widths define it. */
+  /* min-width: 600px; */
+  border-collapse: collapse;
+  table-layout: fixed; /* IMPORTANT: This helps respect defined column widths more strictly,
+                          especially when some columns have a lot of text and others are fixed width.
+                          It can sometimes make columns with lots of text truncate if not handled
+                          with overflow properties, but here we use it with max-width for wrappable ones. */
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  padding: 12px 10px; /* Slightly reduced horizontal padding for narrower columns */
+  text-align: left;
+  vertical-align: top;
+}
+
+/* Specific width for Rank column */
+.leaderboard-table .rank-col {
+  width: 70px;  /* Adjust as needed for "Rank" and 2-digit numbers + padding */
+  text-align: center; /* Center rank numbers */
+  white-space: nowrap;
+}
+
+/* Specific width for Score column */
+.leaderboard-table .score-col {
+  width: 80px;  /* Adjust as needed for "Score" and "XX.X" + padding */
+  text-align: right; /* Right-align scores for better readability */
+  white-space: nowrap;
+}
+
+/* Styles for columns that should wrap text */
+.leaderboard-table .wrappable-text-col {
+  white-space: normal;
+  word-break: break-word;
+  /* max-width: 200px; Let this be flexible, taking remaining space.
+                     Or set a specific width if preferred: e.g., width: 40%; */
+  /* If using table-layout: fixed, we should give these an explicit width too,
+     or let them take up remaining space by not setting a width.
+     If you want them to be roughly equal, you can try:
+     width: calc((100% - 70px - 80px) / 2);
+     But this can be tricky. Often, just letting them expand is fine, or set one to a percentage.
+     Let's try letting them expand for now. The max-width from before isn't strictly
+     needed if table-layout:fixed and other columns have fixed widths. */
+}
+
+/* Columns that are not rank, score, or wrappable (if any in the future)
+ and should not wrap. This rule is currently not strictly needed as rank/score
+ have nowrap and wrappable has normal. Keeping for completeness if you add other types. */
+.leaderboard-table th:not(.rank-col):not(.score-col):not(.wrappable-text-col),
+.leaderboard-table td:not(.rank-col):not(.score-col):not(.wrappable-text-col) {
+  white-space: nowrap;
+}
+
+
+.leaderboard-table th {
+  background-color: var(--bs-primary, #007bff);
+  color: var(--bs-light, white);
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.leaderboard-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.075);
+}
+
+.leaderboard-placeholder-text {
+  text-align: center;
+  font-style: italic;
+  padding: 40px 0;
+}
