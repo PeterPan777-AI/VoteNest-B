@@ -7,8 +7,15 @@
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0; /* Remove default margins */
-  padding: 0; /* Remove default padding */
+  margin: 0;
+  padding: 0;
+}
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==========================================================================
@@ -16,137 +23,206 @@
    ========================================================================== */
 
 :root {
-  --color-primary: #007bff;     /* Your original primary blue. Bootstrap components (btn-primary, etc.) will use their own primary unless you've customized Bootstrap's Sass variables. */
-  --color-secondary: #6c757d;   /* Your original secondary gray. */
+  /* Modern Color Palette (complements Bootstrap dark theme) */
+  --color-primary: #6366F1;       /* Modern indigo (better contrast on dark) */
+  --color-secondary: #8B5CF6;     /* Purple accent (works well with dark) */
+  --color-accent: #10B981;        /* Teal for success/positive actions */
+  --color-danger: #EF4444;        /* Red for errors */
+  --color-surface: #1F2937;       /* Dark gray surface (matches Bootstrap dark) */
+  --color-text: #F9FAFB;          /* Light text for dark theme */
+  --color-border: #374151;        /* Subtle border for dark theme */
 
-  /* For dark theme, Bootstrap will manage main text and background.
-     These can be used for custom components if needed, or adjusted/removed. */
-  --color-text-custom: #212529;       /* Original text color (for light mode if you had a toggle) */
-  --color-background-custom: #ffffff; /* Original background color (for light mode if you had a toggle) */
+  /* Spacing & Sizing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1.5rem;           /* Increased for better breathing room */
+  --spacing-lg: 2rem;
+  --border-radius-sm: 0.375rem;   /* Bootstrap's default sm radius */
+  --border-radius: 0.5rem;        /* Slightly larger for modern feel */
+  --border-radius-lg: 0.75rem;
 
-  --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-
-  /* --font-size-base: 1rem; */ /* Base font size is set in body */
-
-  --line-height-base: 1.6;      /* Original line height */
-  --spacing-md: 1rem;
-  --border-radius: 0.25rem;
+  /* Typography */
+  --font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
 }
 
 /* ==========================================================================
    3. Body & HTML Defaults
    ========================================================================== */
 
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 body {
   font-family: var(--font-family-base);
-  font-size: 0.8rem; /* Global font size */
-  line-height: 1.5; /* Adjusted line height for smaller font */
-
-  /* Bootstrap (data-bs-theme="dark" on <html>) sets body text and background colors.
-     If Bootstrap is imported and data-bs-theme is active,
-     these will be:
-     color: var(--bs-body-color);
-     background-color: var(--bs-body-bg);
-  */
-
+  font-size: 0.9rem;              /* Slightly larger for readability */
+  line-height: 1.6;               /* Better readability */
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text);       /* Dark theme text color */
+  background-color: var(--color-surface); /* Dark theme background */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Make sure the main content area can grow */
-.App > .main-content {
+/* Ensure main content area grows */
+main {
   flex-grow: 1;
 }
 
+/* Container with max width */
+.container {
+  width: 100%;
+  max-width: 1280px;             /* Wider container for modern screens */
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+/* Add subtle page transitions */
+.page-transition {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ==========================================================================
    4. Basic Element Styling
    ========================================================================== */
 
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: var(--spacing-md);
-  font-weight: 600;
-  /* Text color for headings will be inherited from Bootstrap's theme-aware --bs-heading-color or --bs-body-color */
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: 1.2;
 }
 
+/* Paragraphs */
 p {
   margin-bottom: var(--spacing-md);
-  /* Text color for paragraphs will be inherited from Bootstrap's --bs-body-color */
+  color: var(--color-text);
+  opacity: 0.9; /* Slightly muted text */
 }
 
+/* Links */
 a {
-  color: var(--bs-link-color); /* MODIFIED: Use Bootstrap's theme-aware link color */
-  text-decoration: none; /* Default is often 'underline', explicitly set to 'none' if preferred globally */
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--bs-link-hover-color); /* MODIFIED: Use Bootstrap's theme-aware link hover color */
+  color: #4F46E5; /* Darker shade of primary for hover */
   text-decoration: underline;
 }
 
+/* Images */
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-button {
-  /* Bootstrap button classes (.btn, .btn-primary, etc.) will largely style buttons.
-     If you have custom non-Bootstrap buttons, they might need specific dark theme styling. */
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  border: 1px solid transparent;
+/* Buttons (complements Bootstrap) */
+.btn {
+  font-weight: var(--font-weight-medium);
+  padding: 0.75rem 1.5rem;       /* Larger padding for better touch targets */
   border-radius: var(--border-radius);
+  transition: all 0.2s ease;     /* Smoother transitions */
 }
 
-/* Example utility class */
-.container {
-  width: 90%;
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 0 1rem;
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
-/* ==========================================================================
-   Go To Top Button Styles
-   ========================================================================== */
+.btn-primary:hover {
+  background-color: #4F46E5;     /* Darker shade for hover */
+  border-color: #4F46E5;
+  transform: translateY(-1px);    /* Subtle lift on hover */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
 
+.btn-primary:active {
+  transform: translateY(0);      /* Reset on click */
+}
+
+/* Forms */
+.form-control {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: rgba(31, 41, 55, 0.5); /* Dark input background */
+  color: var(--color-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); /* Indigo focus ring */
+}
+
+/* Card-like container (common UI element) */
+.card {
+  background: rgba(31, 41, 55, 0.8); /* Slightly lighter than surface */
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--spacing-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Go To Top Button */
 .go-to-top-button {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 2rem;
+  right: 2rem;
   z-index: 1000;
-
-  /* Uses Bootstrap variables which adapt to the theme */
-  background-color: var(--bs-secondary-bg); /* Will be dark in dark mode */
-  color: var(--bs-light); /* Will be light text in dark mode */
-
-  border: none;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   font-size: 1.2rem;
-  line-height: 40px; /* Ensure icon is centered */
+  line-height: 48px;
   text-align: center;
-
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: background-color 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
   opacity: 0.8;
 }
 
 .go-to-top-button:hover {
-  /* Check appearance of --bs-primary on dark backgrounds.
-     If var(--bs-primary) (default #007bff) doesn't have enough contrast on dark hover,
-     consider using a lighter blue for dark mode hover, or a different Bootstrap variable.
-     For example: var(--bs-primary-bg-subtle) for a subtle dark blue,
-     or define a custom dark theme hover color. */
-  background-color: var(--bs-primary);
+  background-color: var(--color-primary);
+  color: white;
   opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  :root {
+    --spacing-md: 1rem;
+  }
+
+  body {
+    font-size: 0.875rem;
+  }
+
+  .container {
+    padding: var(--spacing-sm);
+  }
+
+  .btn {
+    padding: 0.6rem 1.2rem;
+  }
 }
